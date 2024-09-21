@@ -21,7 +21,7 @@ To get started with the Suraksha project, follow these steps:
 
    ```sh
      git clone https://github.com/Akshay-Tomar-1135/suraksha-frontend.git
-     cd Suraksha-Frontend
+     cd suraksha-frontend
    ```
 
 2. **Install dependencies:**
