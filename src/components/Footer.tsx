@@ -1,4 +1,4 @@
-import Logo from "/assets/images/others/new-logo-Photoroom.png";
+import Logo from "/assets/images/others/main-logo.png";
 import {
   FaLinkedin,
   FaXTwitter,
@@ -7,9 +7,9 @@ import {
 import { AiFillInstagram } from "react-icons/ai";
 import Box from "@mui/material/Box";
 
-export default function Footer(){
+export default function Footer() {
   return (
-    <div className="flex flex-col md:flex-row bg-black text-white p-16 gap-8 justify-between md:px-20 xl:px-44">
+    <div className="flex flex-col md:flex-row bg-gray-900 text-white p-16 gap-8 justify-between md:px-20 xl:px-44">
       <div className="flex flex-col gap-8 text-gray-300/85 max-w-[300px]">
         <Box component="img" src={Logo} alt="Logo" className="cursor-pointer" />
         
@@ -46,7 +46,7 @@ export default function Footer(){
       </div>
       <div className="flex flex-col gap-4">
         <div className="font-bold text-lg">Legal</div>
-        <div className="cursor-pointer text-gray-300/85">Privacy </div>
+        <div className="cursor-pointer text-gray-300/85">Privacy</div>
         <div className="cursor-pointer text-gray-300/85">Terms</div>
         <div className="cursor-pointer text-gray-300/85">Security</div>
       </div>

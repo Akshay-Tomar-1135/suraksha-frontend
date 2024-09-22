@@ -22,13 +22,13 @@ const ProductShowcase = () => {
   return (
     <div
       ref={sectionRef}
-      className="bg-gradient-to-t from-[#ff9aa2] to-white flex flex-col items-center overflow-x-hidden pb-24"
+      className="bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] flex flex-col items-center overflow-x-hidden pb-24"
     >
       <div className="flex flex-col items-center font-medium mt-24 px-8 mx-auto md:w-[550px] lg:w-[630px]">
-        <div className="border-2 w-fit p-0.5 px-3 text-sm rounded-xl border-slate-300/80">
+        <div className="border-2 w-fit p-0.5 px-3 text-sm rounded-xl border-[#6a0dad]/80">
           Empowering Women Everywhere
         </div>
-        <div className="text-3xl md:text-4xl lg:text-5xl py-6 font-bold tracking-tighter text-center bg-gradient-to-b from-black to-[#ff4d6d] text-transparent bg-clip-text">
+        <div className="text-3xl md:text-4xl lg:text-5xl py-6 font-bold tracking-tighter text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
           A Safer Tomorrow Starts with Suraksha
         </div>
 

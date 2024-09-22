@@ -1,4 +1,4 @@
-import Logo from "/assets/images/others/logo.png";
+import Logo from "/assets/images/others/main-logo.png";
 import { FaBars } from "react-icons/fa";
 import Box from "@mui/material/Box";
 import { useRouter } from 'src/routes/hooks';
@@ -22,7 +22,7 @@ const Header = () => {
             <a href="#">Customers</a>
           </li>
           <li>
-            <a href="#">Updates</a>
+            <a href="#">Feedback</a>
           </li>
           <li>
             <a href="#">Help</a>

@@ -1,11 +1,13 @@
+import React from 'react';
+
 export default function Button({
   text,
   className = "text-white bg-black py-2 px-3 rounded-lg cursor-pointer",
-  onButtonClick = () => {},
+  onButtonClick,
 }: {
   text: string;
   className?: string;
-  onButtonClick?: () => void;
+  onButtonClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // MouseEvent only
 }) {
   return (
     <button
@@ -17,3 +19,6 @@ export default function Button({
     </button>
   );
 }
+
+
+
