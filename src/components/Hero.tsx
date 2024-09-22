@@ -5,6 +5,8 @@ import HeroImage from '/assets/images/others/Visual.png';
 import Cylinder from '/assets/images/others/cylinder.png';
 import HalfTorus from '/assets/images/others/half-torus.png';
 import Button from './Button';
+import Img from "./image.png";
+import Img2 from "./image (1).png";
 
 const Hero = () => {
   const heroRef = useRef(null);
@@ -45,14 +47,17 @@ const Hero = () => {
         </div>
 
         <div className="pt-12 md:pt-0 md:h-[648px] md:w-[648px] relative">
-          <motion.img
-            src={Cylinder}
+          {/* <motion.img
+            src={Img2}
             alt="Cylinder"
-            className="hidden md:block md:absolute -left-8 -top-8"
-            style={{ translateY }}
-          />
+            className=" hidden md:block md:absolute -left-8 -top-8"
+            style={{
+              translateY, height:"200px", width: "200px"
+            }}
+          /> */}
           <motion.img
-            src={HeroImage}
+            // src={HeroImage}
+            src ={Img}
             alt="Hero Image"
             className="md:absolute md:h-full md:w-auto md:max-w-none"
             animate={{
@@ -65,12 +70,14 @@ const Hero = () => {
               ease: 'easeInOut',
             }}
           />
-          <motion.img
+          {/* <motion.img
             src={HalfTorus}
             alt="HalfTorus"
             className="hidden lg:block md:absolute left-[400px] top-[500px]"
-            style={{ translateY }}
-          />
+            style={{
+              translateY,
+            }}
+          /> */}
         </div>
       </div>
     </section>
