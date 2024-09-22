@@ -8,7 +8,15 @@ import { Map as MapLibreMap, NavigationControl, Marker } from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-function App() {
+
+
+
+import "../../../OlaMapsWebSDK/style.css";
+import { OlaMaps } from "../../../OlaMapsWebSDK/olamaps-js-sdk.es";
+
+
+
+function RenderMap() {
   const [mapReady, setMapReady] = useState(false);
   const [source, setSource] = useState([77.5353394, 13.03106]);
   const [destination, setDestination] = useState([77.5353394, 15.03106]);
@@ -25,15 +33,12 @@ function App() {
 
     const map = new MapLibreMap({
       container: "central-map",
-      center: [0, 0],
-      zoom: 0,
+      center: [77.5353394, 16.03106],
+      zoom: 10,
       style:
         "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
       transformRequest: (url, resourceType) => {
-        // Replace the wrong URL with the correct one
         url = url.replace("app.olamaps.io", "api.olamaps.io");
-
-        // Add the API key to the URL based on existing parameters
         if (url.includes("?")) {
           url = `${url}&api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
         } else {
@@ -59,28 +64,17 @@ function App() {
     });
 
     map.on("load", () => {
-      // Create an instance of the default class
       const directions = new MapLibreGlDirections(map);
-
-      // Enable interactivity (if needed)
       directions.interactive = true;
-
-      // Optionally add the standard loading-indicator control
       map.addControl(new LoadingIndicatorControl(directions));
-
-      // Set the waypoints programmatically
       directions.setWaypoints([
         [77.5353394, 13.03106],
         [77.5353394, 15.03106],
       ]);
 
-      // Remove waypoints
       directions.removeWaypoint(0);
 
-      // Add waypoints
       directions.addWaypoint([-73.8671258, 40.82234996], 0);
-
-      // Remove everything plugin-related from the map
       directions.clear();
     });
   }, [mapReady]);
@@ -105,7 +99,6 @@ function App() {
     <>
 
 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        {/* Source and Destination Input */}
         <div>
           <label>Source (lng,lat):</label>
           <input
@@ -164,4 +157,4 @@ function App() {
   );
 }
 
-export default App;
+export default RenderMap;
