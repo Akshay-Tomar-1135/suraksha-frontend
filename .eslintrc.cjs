@@ -108,4 +108,12 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'react/prop-types': 'off', // Disable prop-types validation for TypeScript files
+      },
+    },
+  ],
 };
