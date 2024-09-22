@@ -21,17 +21,17 @@ const Hero = () => {
   return (
     <section
       ref={heroRef}
-      className="p-8 pb-16 md:p-10 lg:p-20 font-medium bg-gradient-to-tr from-[#ff9aa2] via-[#e4eaff]  overflow-x-clip md:items-center gap-3"
+      className="p-8 pb-16 md:p-10 lg:p-20 font-medium bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] overflow-x-clip md:items-center gap-3"
     >
       <div className="md:flex items-center justify-center gap-16">
         <div className="md:w-[478px]">
-          <div className="border-2 w-fit p-0.5 px-1 lg:text-lg rounded-lg border-slate-400/80">
+          <div className="border-2 w-fit p-0.5 px-1 lg:text-lg rounded-lg border-[#6a0dad]">
             Welcome to Suraksha
           </div>
-          <div className="text-5xl md:text-7xl font-black my-7 bg-gradient-to-b from-black to-[#ff4d6d] text-transparent bg-clip-text tracking-tighter">
+          <div className="text-5xl md:text-7xl font-black my-7 bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text tracking-tighter">
             Redefining Safety, Empowering Women
           </div>
-          <div className="text-xl lg:text-2xl tracking-tighter opacity-85">
+          <div className="text-black-100 lg:text-2xl tracking-tighter opacity-90">
             Suraksha is committed to empowering women by fostering safety and promoting awareness.
             Our platform builds a community that supports women to live without fear. Join us in
             shaping a future where safety is a right for every woman.

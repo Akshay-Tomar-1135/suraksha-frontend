@@ -18,7 +18,7 @@ const CTA = () => {
   return (
     <div
       ref={sectionRef}
-      className="flex flex-col items-center pt-16 pb-24 px-14 bg-gradient-to-t from-[#ff4d6d] to-[#f5f5f5] overflow-x-clip"
+      className="flex flex-col items-center pt-16 pb-24 px-14 bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] overflow-x-clip"
     >
       <div className="max-w-[570px] flex flex-col items-center relative">
         <motion.img
@@ -37,13 +37,16 @@ const CTA = () => {
             translateY,
           }}
         />
-        <div className="text-4xl md:text-5xl lg:text-6xl py-6 font-bold tracking-tighter text-center bg-gradient-to-b from-black to-[#ff4d6d] text-transparent bg-clip-text">
+        <div className="text-4xl md:text-5xl lg:text-6xl py-6 font-bold tracking-tighter text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
           Sign up for free today
         </div>
+        
+
+
+
 
         <div className="text-center text-lg mb-8 md:text-xl text-gray-800">
-          Celebrate the joy of accomplishment with an app designed to track your
-          progress and motivate your efforts.
+            Empower women and ensure their safety with our innovative app designed to keep you protected.
         </div>
 
         <div className="flex items-center gap-4 mt-4 text-lg">
