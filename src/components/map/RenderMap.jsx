@@ -1,26 +1,17 @@
-import { useState ,useEffect} from "react"
+import React, { useState, useEffect, useRef } from "react";
+import { FaWalking, FaCar, FaBus } from "react-icons/fa";
 import MapLibreGlDirections, {
   LoadingIndicatorControl,
 } from "@maplibre/maplibre-gl-directions";
-import { FaWalking, FaCar, FaBus } from "react-icons/fa";
-// import {  } from "react";
 import { Map as MapLibreMap, NavigationControl, Marker } from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-
-
-
-import "../../../OlaMapsWebSDK/style.css";
-import { OlaMaps } from "../../../OlaMapsWebSDK/olamaps-js-sdk.es";
-
-
-
 function RenderMap() {
-  const [mapReady, setMapReady] = useState(false);
   const [source, setSource] = useState([77.5353394, 13.03106]);
   const [destination, setDestination] = useState([77.5353394, 15.03106]);
-  const [travelType, setTravelType] = useState("driving"); // default travel type
+  const [error, setError] = useState(null);
+  const [travelType, setTravelType] = useState("driving");
 
   const travelModes = {
     walking: { icon: FaWalking, color: "#4CAF50" },
@@ -28,13 +19,41 @@ function RenderMap() {
     bus: { icon: FaBus, color: "#2196F3" },
   };
 
-  useEffect(() => {
-    if (!mapReady) return;
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const mapRef = useRef(null); // Use ref for map instance
+  const markerRef = useRef(null); // Ref for marker
 
-    const map = new MapLibreMap({
+  // Function to fetch the location
+  const fetchLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude });
+        },
+        (err) => {
+          setError(err.message);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  };
+
+  // Fetch location every 3 seconds
+  useEffect(() => {
+    const intervalId = setInterval(fetchLocation, 3000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Initialize map only once
+  useEffect(() => {
+    if (mapRef.current) return; // Prevent re-initializing
+
+    const mapInstance = new MapLibreMap({
       container: "central-map",
-      center: [77.5353394, 16.03106],
-      zoom: 10,
+      center: [77.5353394, 16.03106], // Fallback to a default location
+      zoom: 4,
       style:
         "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
       transformRequest: (url, resourceType) => {
@@ -48,37 +67,40 @@ function RenderMap() {
       },
     });
 
+    mapRef.current = mapInstance; // Store map instance in ref
+
     const nav = new NavigationControl({
       visualizePitch: false,
       showCompass: true,
     });
 
-    map.addControl(nav, "top-left");
+    mapInstance.addControl(nav, "top-left");
 
-    new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
+    // Initialize marker with default location
+    markerRef.current = new Marker()
+      .setLngLat([77.5353394, 16.03106]) // Default location
+      .addTo(mapInstance);
 
-    map.on("click", "symbols", (e) => {
-      map.flyTo({
+    mapInstance.on("click", "symbols", (e) => {
+      mapInstance.flyTo({
         center: e.features[0].geometry.coordinates,
       });
     });
 
-    map.on("load", () => {
-      const directions = new MapLibreGlDirections(map);
+    mapInstance.on("load", () => {
+      const directions = new MapLibreGlDirections(mapInstance);
       directions.interactive = true;
-      map.addControl(new LoadingIndicatorControl(directions));
-      directions.setWaypoints([
-        [77.5353394, 13.03106],
-        [77.5353394, 15.03106],
-      ]);
-
+      mapInstance.addControl(new LoadingIndicatorControl(directions));
       directions.removeWaypoint(0);
-
-      directions.addWaypoint([-73.8671258, 40.82234996], 0);
-      directions.clear();
     });
-  }, [mapReady]);
+  }, []);
 
+  // Update marker position when location changes
+  useEffect(() => {
+    if (location.latitude && location.longitude && markerRef.current) {
+      markerRef.current.setLngLat([location.longitude, location.latitude]);
+    }
+  }, [location]);
 
   const handleTravelTypeChange = (type) => {
     setTravelType(type);
@@ -95,17 +117,15 @@ function RenderMap() {
   };
 
   return (
-    
     <>
-
-<div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         <div>
           <label>Source (lng,lat):</label>
           <input
             type="text"
             value={source.join(",")}
             onChange={handleSourceChange}
-            className="input-box" // Add class for styling
+            className="input-box"
           />
         </div>
 
@@ -115,44 +135,42 @@ function RenderMap() {
             type="text"
             value={destination.join(",")}
             onChange={handleDestinationChange}
-            className="input-box" // Add class for styling
+            className="input-box"
           />
         </div>
 
         {/* Travel Type Selection */}
         <div style={{ display: "flex", gap: "10px" }}>
-        {Object.keys(travelModes).map((mode) => {
-  const Icon = travelModes[mode].icon;
-  return (
-    <button
-      key={mode}
-      type="button" // Specify the type here
-      onClick={() => handleTravelTypeChange(mode)}
-      style={{
-        backgroundColor:
-          travelType === mode ? travelModes[mode].color : "gray",
-        color: "white",
-        border: "none",
-        padding: "10px",
-        borderRadius: "50%",
-        cursor: "pointer",
-      }}
-    >
-      <Icon />
-    </button>
-  );
-})}
+          {Object.keys(travelModes).map((mode) => {
+            const Icon = travelModes[mode].icon;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => handleTravelTypeChange(mode)}
+                style={{
+                  backgroundColor:
+                    travelType === mode ? travelModes[mode].color : "gray",
+                  color: "white",
+                  border: "none",
+                  padding: "10px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+              >
+                <Icon />
+              </button>
+            );
+          })}
         </div>
       </div>
 
-
-
-
       <div
-        style={{ width: "70vw", height: "90vh", overflow: "hidden" }}
-        ref={() => setMapReady(true)}
+        style={{ width: "90vw", height: "90vh", overflow: "hidden" }}
         id="central-map"
       />
+
+      {error && <p>Error: {error}</p>}
     </>
   );
 }
