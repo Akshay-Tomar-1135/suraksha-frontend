@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MapLibreGlDirections, { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
 import { FaWalking, FaCar } from "react-icons/fa";
 import { Map as MapLibreMap, NavigationControl, Marker } from "maplibre-gl";
@@ -15,20 +15,100 @@ function RenderMap() {
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [travelType, setTravelType] = useState("driving");
-
+  const [error, setError] = useState(null);
   const travelModes = {
     walking: { icon: FaWalking, color: "#4CAF50" },
     driving: { icon: FaCar, color: "#FF9800" },
   };
 
-  useEffect(() => {
-    if (!mapReady) return;
+  // useEffect(() => {
+  //   if (!mapReady) return;
 
-    const map = new MapLibreMap({
+  //   const map = new MapLibreMap({
+  //     container: "central-map",
+  //     center: [77.5353394, 16.03106],
+  //     zoom: 10,
+  //     style: "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
+  //     transformRequest: (url, resourceType) => {
+  //       url = url.replace("app.olamaps.io", "api.olamaps.io");
+  //       if (url.includes("?")) {
+  //         url = `${url}&api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
+  //       } else {
+  //         url = `${url}?api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
+  //       }
+  //       return { url, resourceType };
+  //     },
+  //   });
+
+  //   const nav = new NavigationControl({
+  //     visualizePitch: false,
+  //     showCompass: true,
+  //   });
+
+  //   map.addControl(nav, "top-left");
+  //   new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
+
+  //   map.on("click", "symbols", (e) => {
+  //     map.flyTo({
+  //       center: e.features[0].geometry.coordinates,
+  //     });
+  //   });
+
+  //   map.on("load", () => {
+  //     const directions = new MapLibreGlDirections(map);
+  //     directions.interactive = true;
+  //     map.addControl(new LoadingIndicatorControl(directions));
+  //     directions.setWaypoints([
+  //       [77.5353394, 13.03106],
+  //       [77.5353394, 15.03106],
+  //     ]);
+
+  //     // directions.removeWaypoint(0);
+  //     // directions.addWaypoint([-73.8671258, 40.82234996], 0);
+  //     // directions.clear();
+  //   });
+  
+  // }, [mapReady]);
+
+
+
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const mapRef = useRef(null); // Use ref for map instance
+  const markerRef = useRef(null); // Ref for marker
+
+  // Function to fetch the location
+  const fetchLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude });
+        },
+        (err) => {
+          setError(err.message);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  };
+
+  // Fetch location every 3 seconds
+  useEffect(() => {
+    const intervalId = setInterval(fetchLocation, 3000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Initialize map only once
+  useEffect(() => {
+    if (mapRef.current) return; // Prevent re-initializing
+
+    const mapInstance = new MapLibreMap({
       container: "central-map",
-      center: [77.5353394, 16.03106],
-      zoom: 10,
-      style: "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
+      center: [77.5353394, 16.03106], // Fallback to a default location
+      zoom: 4,
+      style:
+        "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
       transformRequest: (url, resourceType) => {
         url = url.replace("app.olamaps.io", "api.olamaps.io");
         if (url.includes("?")) {
@@ -40,34 +120,51 @@ function RenderMap() {
       },
     });
 
+    mapRef.current = mapInstance; // Store map instance in ref
+
     const nav = new NavigationControl({
       visualizePitch: false,
       showCompass: true,
     });
 
-    map.addControl(nav, "top-left");
-    new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
+    mapInstance.addControl(nav, "top-left");
 
-    map.on("click", "symbols", (e) => {
-      map.flyTo({
+    // Initialize marker with default location
+    markerRef.current = new Marker()
+      .setLngLat([77.5353394, 16.03106]) // Default location
+      .addTo(mapInstance);
+
+    mapInstance.on("click", "symbols", (e) => {
+      mapInstance.flyTo({
         center: e.features[0].geometry.coordinates,
       });
     });
 
-    map.on("load", () => {
-      const directions = new MapLibreGlDirections(map);
+    mapInstance.on("load", () => {
+      const directions = new MapLibreGlDirections(mapInstance);
       directions.interactive = true;
-      map.addControl(new LoadingIndicatorControl(directions));
+      mapInstance.addControl(new LoadingIndicatorControl(directions));
+
+
       directions.setWaypoints([
-        [77.5353394, 13.03106],
-        [77.5353394, 15.03106],
+        [72.83028, 18.93016],  // Mumbai (Start)
+        [88.37124, 22.57054],  // Kolkata (Midpoint)
+        [77.11578, 28.643206], // Delhi (Destination)
       ]);
 
-      directions.removeWaypoint(0);
-      directions.addWaypoint([-73.8671258, 40.82234996], 0);
-      directions.clear();
+
+
+      // directions.removeWaypoint(0);
     });
-  }, [mapReady]);
+  }, []);
+
+  // Update marker position when location changes
+  useEffect(() => {
+    if (location.latitude && location.longitude && markerRef.current) {
+      markerRef.current.setLngLat([location.longitude, location.latitude]);
+    }
+  }, [location]);
+
 
   const handleTravelTypeChange = (type) => {
     setTravelType(type);
@@ -158,9 +255,9 @@ function RenderMap() {
         style={{
           width: "65vw",
           height: "68vh",
-          borderRadius: "20px",
+          borderRadius: "10px",
           overflow: "hidden",
-          border: '3px solid black'
+          border: '1px solid black'
         }}
         ref={() => setMapReady(true)}
         id="central-map"
