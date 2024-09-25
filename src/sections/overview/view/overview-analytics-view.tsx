@@ -20,9 +20,9 @@ import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 export function OverviewAnalyticsView() {
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+      {/* <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
         Ola, Tomar iska css sahi karo
-      </Typography>
+      </Typography> */}
 
 
       <RenderMap/>

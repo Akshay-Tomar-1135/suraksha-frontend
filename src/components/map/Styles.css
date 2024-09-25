@@ -1,0 +1,90 @@
+
+
+
+body {
+  background: #efefef;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.field {
+  position: relative;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 400px; /* Optional: limit width */
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  padding-right: 30px; /* Add space for the clear icon */
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: 0;
+}
+
+.line {
+  width: 100%;
+  height: 2px;
+  background: #bdc3c7;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: background 0.3s ease;
+}
+
+input:focus + .line {
+  background: #a0c8f0;
+}
+
+.clear-icon {
+  position: absolute;
+  right: 10px; /* Position the icon to the right inside the input field */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  visibility: hidden; /* Initially hidden */
+  width: 18px; /* Adjust the size as needed */
+  height: 18px; /* Adjust the size as needed */
+}
+
+input:not(:placeholder-shown) + .line + .clear-icon {
+  visibility: visible; /* Show icon when input has content */
+}
+
+
+
+.input-container {
+  margin-bottom: 5px;
+}
+
+.field {
+  flex: 1;
+  margin-right: 10px;
+  position: relative;
+}
+
+.clear-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.clear-icon svg {
+  fill: #888;
+}
+
+.clear-icon:hover svg {
+  fill: #ff0000; 
+}
+
+.box {
+  display: flex;
+  align-items: center;
+}

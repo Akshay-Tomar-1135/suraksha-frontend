@@ -16,8 +16,6 @@ const FeedbackForm = () => {
       feedback,
       rating,
     };
-
-    console.log(formData);
   
     try {
       const response = await fetch('/feedback', {
@@ -29,14 +27,12 @@ const FeedbackForm = () => {
       });
   
       if (!response.ok) {
-        const errorMessage = await response.text(); // Get response text for debugging
+        const errorMessage = await response.text(); 
         throw new Error(`Network response was not ok: ${errorMessage}`);
       }
   
-      // Handle successful submission
       alert('Feedback submitted successfully!');
       
-      // Reset form
       setName('');
       setEmail('');
       setFeedback('');
@@ -58,30 +54,30 @@ const FeedbackForm = () => {
   };
 
   return (
-    <section className="py-16 px-14 bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] text-black">
+    <section className="py-10 px-6 sm:px-8 md:px-10 bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] text-black">
       <div className="flex flex-col items-center max-w-4xl mx-auto">
-        <div className="text-4xl lg:text-5xl pt-6 font-bold tracking-tighter mb-6 text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
+        <div className="text-3xl md:text-4xl lg:text-5xl pt-4 font-bold tracking-tighter mb-4 text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
           We Value Your Feedback
         </div>
 
-        <p className="text-lg md:text-xl mb-8 text-center">
+        <p className="text-base md:text-lg lg:text-xl mb-6 text-center">
           Help us make Suraksha better by sharing your thoughts and experiences. We appreciate your input!
         </p>
 
         {/* Emoji Rating Section */}
-        <div className="mb-8">
-          <p className="text-xl mb-4 text-center">Was this page helpful? Let us know how we did</p>
-          <div className="container flex justify-center space-x-4">
+        <div className="mb-6">
+          <p className="text-lg mb-4 text-center">Was this page helpful? Let us know how we did</p>
+          <div className="flex justify-center space-x-4">
             {[1, 2, 3, 4, 5].map((rate, index) => {
               const emojis = ['🤬', '🙁', '😶', '😁', '😍'];
               return (
                 <div className="item" key={index}>
                   <span
-                    className={`emoji text-6xl inline-block transition-transform transform duration-300 ease-in-out ${
+                    className={`emoji text-3xl sm:text-4xl md:text-5xl lg:text-6xl inline-block transition-transform transform duration-300 ease-in-out ${
                       rate === rating ? 'scale-125' : ''
                     } hover:scale-125 cursor-pointer`}
                     onClick={() => handleRatingClick(rate)}
-                    onKeyDown={(e) => handleKeyDown(e, rate)} // Ensure keyboard events are handled
+                    onKeyDown={(e) => handleKeyDown(e, rate)}
                     role="button"
                     tabIndex={0}
                     aria-label={`Rate ${rate}`}
@@ -96,7 +92,7 @@ const FeedbackForm = () => {
 
         {/* Conditionally Render Feedback Form */}
         {rating && (
-          <form onSubmit={handleSubmit} className="w-full md:w-3/4 lg:w-2/3 space-y-6">
+          <form onSubmit={handleSubmit} className="w-full sm:w-4/5 md:w-3/4 lg:w-2/3 space-y-5">
             <div>
               <label htmlFor="full-name" className="block font-medium mb-2">
                 Full Name
