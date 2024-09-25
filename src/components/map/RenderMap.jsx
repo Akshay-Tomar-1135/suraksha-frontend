@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
-import MapLibreGlDirections, {
-  LoadingIndicatorControl,
-} from "@maplibre/maplibre-gl-directions";
+import React, { useState, useEffect } from "react";
+import MapLibreGlDirections, { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
 import { FaWalking, FaCar } from "react-icons/fa";
 import { Map as MapLibreMap, NavigationControl, Marker } from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../../../OlaMapsWebSDK/style.css";
-import './Styles.css'; // Ensure this path is correct
+import './Styles.css';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -23,38 +21,10 @@ function RenderMap() {
     driving: { icon: FaCar, color: "#FF9800" },
   };
 
-  const [location, setLocation] = useState({ latitude: null, longitude: null });
-  const mapRef = useRef(null); // Use ref for map instance
-  const markerRef = useRef(null); // Ref for marker
-
-  // Function to fetch the location
-  const fetchLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ latitude, longitude });
-        },
-        (err) => {
-          setError(err.message);
-        }
-      );
-    } else {
-      setError("Geolocation is not supported by this browser.");
-    }
-  };
-
-  // Fetch location every 3 seconds
   useEffect(() => {
-    const intervalId = setInterval(fetchLocation, 3000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (!mapReady) return;
 
-  // Initialize map only once
-  useEffect(() => {
-    if (mapRef.current) return; // Prevent re-initializing
-
-    const mapInstance = new MapLibreMap({
+    const map = new MapLibreMap({
       container: "central-map",
       center: [77.5353394, 16.03106],
       zoom: 10,
@@ -70,8 +40,6 @@ function RenderMap() {
       },
     });
 
-    mapRef.current = mapInstance; // Store map instance in ref
-
     const nav = new NavigationControl({
       visualizePitch: false,
       showCompass: true,
@@ -80,15 +48,26 @@ function RenderMap() {
     map.addControl(nav, "top-left");
     new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
 
+    map.on("click", "symbols", (e) => {
+      map.flyTo({
+        center: e.features[0].geometry.coordinates,
+      });
+    });
+
     map.on("load", () => {
       const directions = new MapLibreGlDirections(map);
       directions.interactive = true;
-      mapInstance.addControl(new LoadingIndicatorControl(directions));
+      map.addControl(new LoadingIndicatorControl(directions));
+      directions.setWaypoints([
+        [77.5353394, 13.03106],
+        [77.5353394, 15.03106],
+      ]);
+
       directions.removeWaypoint(0);
       directions.addWaypoint([-73.8671258, 40.82234996], 0);
       directions.clear();
     });
-  }, []);
+  }, [mapReady]);
 
   const handleTravelTypeChange = (type) => {
     setTravelType(type);
@@ -102,6 +81,7 @@ function RenderMap() {
     setDestination(e.target.value);
   };
 
+  // Clear source input
   const clearSourceInput = () => {
     setSource("");
   };
@@ -114,7 +94,7 @@ function RenderMap() {
     <>
       <div className="box" style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
         <div className="input-container" style={{ display: 'flex', justifyContent: 'space-between', width: '92%' }}>
-          <div className="field" style={{ flex: 1, marginRight: '10px', position: 'relative' }}>
+          <div className="field" style={{ flex: 1, marginRight: '10px' }}>
             <TextField
               label="Source (lng, lat)"
               variant="outlined"
@@ -128,11 +108,10 @@ function RenderMap() {
                   </IconButton>
                 ),
               }}
-              style={{ borderRadius: '10px', backgroundColor: '#fff' }}
             />
           </div>
 
-          <div className="field" style={{ flex: 1, marginRight: '20px', position: 'relative' }}>
+          <div className="field" style={{ flex: 1, marginRight: '20px' }}>
             <TextField
               label="Destination (lng, lat)"
               variant="outlined"
@@ -146,12 +125,11 @@ function RenderMap() {
                   </IconButton>
                 ),
               }}
-              style={{ borderRadius: '10px', backgroundColor: '#fff' }}
             />
           </div>
 
           {/* Travel Type Selection */}
-          <div style={{ display: "flex", gap: "10px", alignItems: 'center' }}>
+          <div style={{ display: "flex", gap: "15px", alignItems: 'center' }}>
             {Object.keys(travelModes).map((mode) => {
               const Icon = travelModes[mode].icon;
               return (
@@ -160,21 +138,15 @@ function RenderMap() {
                   type="button"
                   onClick={() => handleTravelTypeChange(mode)}
                   style={{
-                    backgroundColor: travelType === mode ? travelModes[mode].color : "#ccc",
+                    backgroundColor: travelType === mode ? travelModes[mode].color : "gray",
                     color: "white",
                     border: "none",
-                    padding: "12px",
+                    padding: "10px",
                     borderRadius: "50%",
                     cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "background-color 0.3s",
                   }}
-                  onMouseEnter={(e) => { e.target.style.backgroundColor = travelModes[mode].color; }}
-                  onMouseLeave={(e) => { e.target.style.backgroundColor = travelType === mode ? travelModes[mode].color : "#ccc"; }}
                 >
-                  <Icon size={20} />
+                  <Icon />
                 </button>
               );
             })}
@@ -188,15 +160,11 @@ function RenderMap() {
           height: "68vh",
           borderRadius: "20px",
           overflow: "hidden",
-          border: '3px solid #333',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-          position: 'relative',
+          border: '3px solid black'
         }}
         ref={() => setMapReady(true)}
         id="central-map"
       />
-
-      {error && <p>Error: {error}</p>}
     </>
   );
 }
