@@ -1,22 +1,29 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FaArrowRight } from 'react-icons/fa';
-import HeroImage from '/assets/images/others/Visual.png';
-import Cylinder from '/assets/images/others/cylinder.png';
-import HalfTorus from '/assets/images/others/half-torus.png';
 import Button from './Button';
 import Img from "./image.png";
-import Img2 from "./image (1).png";
+
+const words = ["Empowering Women", "Inspiring Change", "Building Community", "Fostering Safety"];
 
 const Hero = () => {
   const heroRef = useRef(null);
-
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start end', 'end start'],
   });
 
   const translateY = useTransform(scrollYProgress, [0, 1], [150, -150]);
+
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 3000); // Change word every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section
@@ -28,8 +35,18 @@ const Hero = () => {
           <div className="border-2 w-fit p-0.5 px-1 lg:text-lg rounded-lg border-[#6a0dad]">
             Welcome to Suraksha
           </div>
-          <div className="text-5xl md:text-7xl font-black my-7 bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text tracking-tighter">
-            Redefining Safety, Empowering Women
+          <div className="text-5xl md:text-7xl font-black my-7 tracking-tighter">
+            Redefining Safety,{" "}
+            <motion.span
+              key={currentWordIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block relative before:content-[''] before:absolute before:left-0 before:bottom-0 before:h-1 before:w-full before:rounded before:opacity-50 before:translate-y-1 before:scale-x-0 before:transition-transform before:duration-300 before:transform hover:before:scale-x-100"
+            >
+              {words[currentWordIndex]}
+            </motion.span>
           </div>
           <div className="text-black-100 lg:text-2xl tracking-tighter opacity-90">
             Suraksha is committed to empowering women by fostering safety and promoting awareness.
@@ -47,17 +64,8 @@ const Hero = () => {
         </div>
 
         <div className="pt-12 md:pt-0 md:h-[648px] md:w-[648px] relative">
-          {/* <motion.img
-            src={Img2}
-            alt="Cylinder"
-            className=" hidden md:block md:absolute -left-8 -top-8"
-            style={{
-              translateY, height:"200px", width: "200px"
-            }}
-          /> */}
           <motion.img
-            // src={HeroImage}
-            src ={Img}
+            src={Img}
             alt="Hero Image"
             className="md:absolute md:h-full md:w-auto md:max-w-none"
             animate={{
@@ -66,18 +74,10 @@ const Hero = () => {
             transition={{
               repeat: Infinity,
               repeatType: 'mirror',
-              duration: 3,
+              duration: 1000,
               ease: 'easeInOut',
             }}
           />
-          {/* <motion.img
-            src={HalfTorus}
-            alt="HalfTorus"
-            className="hidden lg:block md:absolute left-[400px] top-[500px]"
-            style={{
-              translateY,
-            }}
-          /> */}
         </div>
       </div>
     </section>

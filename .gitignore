@@ -30,6 +30,7 @@ build
 .unimportedrc.json
 tsconfig.tsbuildinfo
 .vscode
+yarn.lock
 
 npm-debug.log*
 yarn-debug.log*
