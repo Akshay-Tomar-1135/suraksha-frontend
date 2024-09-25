@@ -23,10 +23,38 @@ function RenderMap() {
     driving: { icon: FaCar, color: "#FF9800" },
   };
 
-  useEffect(() => {
-    if (!mapReady) return;
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const mapRef = useRef(null); // Use ref for map instance
+  const markerRef = useRef(null); // Ref for marker
 
-    const map = new MapLibreMap({
+  // Function to fetch the location
+  const fetchLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude });
+        },
+        (err) => {
+          setError(err.message);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  };
+
+  // Fetch location every 3 seconds
+  useEffect(() => {
+    const intervalId = setInterval(fetchLocation, 3000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Initialize map only once
+  useEffect(() => {
+    if (mapRef.current) return; // Prevent re-initializing
+
+    const mapInstance = new MapLibreMap({
       container: "central-map",
       center: [77.5353394, 16.03106],
       zoom: 10,
@@ -42,6 +70,8 @@ function RenderMap() {
       },
     });
 
+    mapRef.current = mapInstance; // Store map instance in ref
+
     const nav = new NavigationControl({
       visualizePitch: false,
       showCompass: true,
@@ -53,17 +83,12 @@ function RenderMap() {
     map.on("load", () => {
       const directions = new MapLibreGlDirections(map);
       directions.interactive = true;
-      map.addControl(new LoadingIndicatorControl(directions));
-      directions.setWaypoints([
-        [77.5353394, 13.03106],
-        [77.5353394, 15.03106],
-      ]);
-
+      mapInstance.addControl(new LoadingIndicatorControl(directions));
       directions.removeWaypoint(0);
       directions.addWaypoint([-73.8671258, 40.82234996], 0);
       directions.clear();
     });
-  }, [mapReady]);
+  }, []);
 
   const handleTravelTypeChange = (type) => {
     setTravelType(type);
@@ -170,6 +195,8 @@ function RenderMap() {
         ref={() => setMapReady(true)}
         id="central-map"
       />
+
+      {error && <p>Error: {error}</p>}
     </>
   );
 }
