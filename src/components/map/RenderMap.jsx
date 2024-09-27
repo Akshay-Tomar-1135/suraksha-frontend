@@ -1,269 +1,235 @@
-import React, { useState, useEffect, useRef } from "react";
-import MapLibreGlDirections, { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
-import { FaWalking, FaCar } from "react-icons/fa";
-import { Map as MapLibreMap, NavigationControl, Marker } from "maplibre-gl";
+// import React, { useState, useEffect, useRef } from "react";
+// import mapboxgl from "mapbox-gl";
+// import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
+// import { FaWalking, FaCar } from "react-icons/fa";
+// import "mapbox-gl/dist/mapbox-gl.css";
+// import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
+// import TextField from '@mui/material/TextField';
+// import IconButton from '@mui/material/IconButton';
+// import ClearIcon from '@mui/icons-material/Clear';
 
-import "maplibre-gl/dist/maplibre-gl.css";
-import "../../../OlaMapsWebSDK/style.css";
-import './Styles.css';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
+// mapboxgl.accessToken = 'pk.eyJ1IjoiYWlkYXNoLWl2bXMiLCJhIjoiY2s5MmFoaXZkMDJqaTN0b3R0MXp2ZW9vaCJ9.vHhKgvClj48SJpFwjSdgug';
 
-function RenderMap() {
-  const [mapReady, setMapReady] = useState(false);
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
-  const [travelType, setTravelType] = useState("driving");
-  const [error, setError] = useState(null);
-  const travelModes = {
-    walking: { icon: FaWalking, color: "#4CAF50" },
-    driving: { icon: FaCar, color: "#FF9800" },
-  };
+// function RenderMap() {
+//   const [source, setSource] = useState("");
+//   const [destination, setDestination] = useState("");
+//   const [travelType, setTravelType] = useState("driving");
+//   const mapRef = useRef(null); 
+//   const markerRef = useRef(null); 
 
-  // useEffect(() => {
-  //   if (!mapReady) return;
+//   const travelModes = {
+//     walking: { icon: FaWalking, color: "#4CAF50", profile: "walking" },
+//     driving: { icon: FaCar, color: "#FF9800", profile: "driving" },
+//   };
 
-  //   const map = new MapLibreMap({
-  //     container: "central-map",
-  //     center: [77.5353394, 16.03106],
-  //     zoom: 10,
-  //     style: "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
-  //     transformRequest: (url, resourceType) => {
-  //       url = url.replace("app.olamaps.io", "api.olamaps.io");
-  //       if (url.includes("?")) {
-  //         url = `${url}&api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
-  //       } else {
-  //         url = `${url}?api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
-  //       }
-  //       return { url, resourceType };
-  //     },
-  //   });
+//   // Initialize map only once
+//   // useEffect(() => {
+//   //   if (mapRef.current) return;
 
-  //   const nav = new NavigationControl({
-  //     visualizePitch: false,
-  //     showCompass: true,
-  //   });
+//   //   const mapInstance = new mapboxgl.Map({
+//   //     container: "central-map",
+//   //     style: "mapbox://styles/mapbox/streets-v11", 
+//   //     center: [77.5353394, 16.03106], 
+//   //     zoom: 5,
+//   //   });
 
-  //   map.addControl(nav, "top-left");
-  //   new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
+//   //   mapRef.current = mapInstance;
 
-  //   map.on("click", "symbols", (e) => {
-  //     map.flyTo({
-  //       center: e.features[0].geometry.coordinates,
-  //     });
-  //   });
+//   //   const nav = new mapboxgl.NavigationControl();
+//   //   mapInstance.addControl(nav, "top-left");
 
-  //   map.on("load", () => {
-  //     const directions = new MapLibreGlDirections(map);
-  //     directions.interactive = true;
-  //     map.addControl(new LoadingIndicatorControl(directions));
-  //     directions.setWaypoints([
-  //       [77.5353394, 13.03106],
-  //       [77.5353394, 15.03106],
-  //     ]);
+//   //   const directions = new MapboxDirections({
+//   //     accessToken: mapboxgl.accessToken,
+//   //     unit: "metric",
+//   //     profile: `mapbox/${travelType}`, // Dynamic travel type
+//   //     interactive: true,
+//   //     alternatives: true,
+//   //   });
 
-  //     // directions.removeWaypoint(0);
-  //     // directions.addWaypoint([-73.8671258, 40.82234996], 0);
-  //     // directions.clear();
-  //   });
-  
-  // }, [mapReady]);
+//   //   mapInstance.addControl(directions, "top-right");
+
+//   //   markerRef.current = new mapboxgl.Marker()
+//   //     .setLngLat([77.5353394, 16.03106])
+//   //     .addTo(mapInstance);
+
+//   //   const waypoints = [
+//   //     { coords: [72.83028, 18.93016], label: "Mumbai (Start)" },
+//   //     { coords: [88.37124, 22.57054], label: "Kolkata (Midpoint)" },
+//   //   ];
+
+//   //   directions.setWaypoints(waypoints.map(wp => wp.coords));
+
+//   //   mapInstance.on("load", () => {
+//   //     directions.setWaypoints(waypoints.map(wp => wp.coords));
+//   //   });
+
+//   //   // return () => {
+//   //   //   mapInstance.remove();
+//   //   // };
+//   // }, [travelType]);
 
 
 
-  const [location, setLocation] = useState({ latitude: null, longitude: null });
-  const mapRef = useRef(null); // Use ref for map instance
-  const markerRef = useRef(null); // Ref for marker
-
-  // Function to fetch the location
-  const fetchLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ latitude, longitude });
-        },
-        (err) => {
-          setError(err.message);
-        }
-      );
-    } else {
-      setError("Geolocation is not supported by this browser.");
-    }
-  };
-
-  // Fetch location every 3 seconds
-  useEffect(() => {
-    const intervalId = setInterval(fetchLocation, 3000);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Initialize map only once
-  useEffect(() => {
-    if (mapRef.current) return; // Prevent re-initializing
-
-    const mapInstance = new MapLibreMap({
-      container: "central-map",
-      center: [77.5353394, 16.03106], // Fallback to a default location
-      zoom: 4,
-      style:
-        "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
-      transformRequest: (url, resourceType) => {
-        url = url.replace("app.olamaps.io", "api.olamaps.io");
-        if (url.includes("?")) {
-          url = `${url}&api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
-        } else {
-          url = `${url}?api_key=SPFxc71FNc3LIdEcqyfDsg01EhUM41Nkq43BiRQf`;
-        }
-        return { url, resourceType };
-      },
-    });
-
-    mapRef.current = mapInstance; // Store map instance in ref
-
-    const nav = new NavigationControl({
-      visualizePitch: false,
-      showCompass: true,
-    });
-
-    mapInstance.addControl(nav, "top-left");
-
-    // Initialize marker with default location
-    markerRef.current = new Marker()
-      .setLngLat([77.5353394, 16.03106]) // Default location
-      .addTo(mapInstance);
-
-    mapInstance.on("click", "symbols", (e) => {
-      mapInstance.flyTo({
-        center: e.features[0].geometry.coordinates,
-      });
-    });
-
-    mapInstance.on("load", () => {
-      const directions = new MapLibreGlDirections(mapInstance);
-      directions.interactive = true;
-      mapInstance.addControl(new LoadingIndicatorControl(directions));
-
-
-      directions.setWaypoints([
-        [72.83028, 18.93016],  // Mumbai (Start)
-        [88.37124, 22.57054],  // Kolkata (Midpoint)
-        [77.11578, 28.643206], // Delhi (Destination)
-      ]);
 
 
 
-      // directions.removeWaypoint(0);
-    });
-  }, []);
+//   useEffect(() => {
+//     mapboxgl.accessToken = 'pk.eyJ1IjoiYWlkYXNoLWl2bXMiLCJhIjoiY2s5MmFoaXZkMDJqaTN0b3R0MXp2ZW9vaCJ9.vHhKgvClj48SJpFwjSdgug'
+//     mapRef.current = new mapboxgl.Map({
+//       container: mapContainerRef.current,
+//       center: center,
+//       zoom: zoom
+//     });
 
-  // Update marker position when location changes
-  useEffect(() => {
-    if (location.latitude && location.longitude && markerRef.current) {
-      markerRef.current.setLngLat([location.longitude, location.latitude]);
-    }
-  }, [location]);
+//     mapRef.current.on('move', () => {
+//       // get the current center coordinates and zoom level from the map
+//       const mapCenter = mapRef.current.getCenter()
+//       const mapZoom = mapRef.current.getZoom()
+
+//       // update state
+//       setCenter([ mapCenter.lng, mapCenter.lat ])
+//       setZoom(mapZoom)
+//     })
+
+//     return () => {
+//       mapRef.current.remove()
+//     }
+//   }, [])
 
 
-  const handleTravelTypeChange = (type) => {
-    setTravelType(type);
-  };
 
-  const handleSourceChange = (e) => {
-    setSource(e.target.value);
-  };
 
-  const handleDestinationChange = (e) => {
-    setDestination(e.target.value);
-  };
 
-  // Clear source input
-  const clearSourceInput = () => {
-    setSource("");
-  };
 
-  const clearDestInput = () => {
-    setDestination("");
-  };
+//   const handleTravelTypeChange = (type) => {
+//     setTravelType(type);
+//   };
 
+//   const handleSourceChange = (e) => {
+//     setSource(e.target.value);
+//   };
+
+//   const handleDestinationChange = (e) => {
+//     setDestination(e.target.value);
+//   };
+
+//   const clearSourceInput = () => {
+//     setSource("");
+//   };
+
+//   const clearDestInput = () => {
+//     setDestination("");
+//   };
+
+//   return (
+//     <>
+//       <div className="box" style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+//         <div className="input-container" style={{ display: 'flex', justifyContent: 'space-between', width: '92%' }}>
+//           <div className="field" style={{ flex: 1, marginRight: '10px' }}>
+//             <TextField
+//               label="Source (lng, lat)"
+//               variant="outlined"
+//               value={source}
+//               onChange={handleSourceChange}
+//               fullWidth
+//               InputProps={{
+//                 endAdornment: (
+//                   <IconButton onClick={clearSourceInput}>
+//                     <ClearIcon />
+//                   </IconButton>
+//                 ),
+//               }}
+//             />
+//           </div>
+
+//           <div className="field" style={{ flex: 1, marginRight: '20px' }}>
+//             <TextField
+//               label="Destination (lng, lat)"
+//               variant="outlined"
+//               value={destination}
+//               onChange={handleDestinationChange}
+//               fullWidth
+//               InputProps={{
+//                 endAdornment: (
+//                   <IconButton onClick={clearDestInput}>
+//                     <ClearIcon />
+//                   </IconButton>
+//                 ),
+//               }}
+//             />
+//           </div>
+
+//           <div style={{ display: "flex", gap: "15px", alignItems: 'center' }}>
+//             {Object.keys(travelModes).map((mode) => {
+//               const Icon = travelModes[mode].icon;
+//               return (
+//                 <button
+//                   key={mode}
+//                   type="button"
+//                   onClick={() => handleTravelTypeChange(mode)}
+//                   style={{
+//                     backgroundColor: travelType === mode ? travelModes[mode].color : "gray",
+//                     color: "white",
+//                     border: "none",
+//                     padding: "10px",
+//                     borderRadius: "50%",
+//                     cursor: "pointer",
+//                   }}
+//                 >
+//                   <Icon />
+//                 </button>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       </div>
+
+//       <div
+//         style={{
+//           width: "65vw",
+//           height: "68vh",
+//           borderRadius: "10px",
+//           overflow: "hidden",
+//           border: '1px solid black'
+//         }}
+//         id="central-map"
+//       />
+//     </>
+//   );
+// }
+
+// export default RenderMap;
+
+
+
+
+
+
+
+import React from 'react';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+const mapStyles = {
+  width: '100%',
+  height: '100%',
+};
+
+const RenderMap = (props) => {
   return (
-    <>
-      <div className="box" style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <div className="input-container" style={{ display: 'flex', justifyContent: 'space-between', width: '92%' }}>
-          <div className="field" style={{ flex: 1, marginRight: '10px' }}>
-            <TextField
-              label="Source (lng, lat)"
-              variant="outlined"
-              value={source}
-              onChange={handleSourceChange}
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={clearSourceInput}>
-                    <ClearIcon />
-                  </IconButton>
-                ),
-              }}
-            />
-          </div>
-
-          <div className="field" style={{ flex: 1, marginRight: '20px' }}>
-            <TextField
-              label="Destination (lng, lat)"
-              variant="outlined"
-              value={destination}
-              onChange={handleDestinationChange}
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={clearDestInput}>
-                    <ClearIcon />
-                  </IconButton>
-                ),
-              }}
-            />
-          </div>
-
-          {/* Travel Type Selection */}
-          <div style={{ display: "flex", gap: "15px", alignItems: 'center' }}>
-            {Object.keys(travelModes).map((mode) => {
-              const Icon = travelModes[mode].icon;
-              return (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => handleTravelTypeChange(mode)}
-                  style={{
-                    backgroundColor: travelType === mode ? travelModes[mode].color : "gray",
-                    color: "white",
-                    border: "none",
-                    padding: "10px",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Icon />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: "65vw",
-          height: "68vh",
-          borderRadius: "10px",
-          overflow: "hidden",
-          border: '1px solid black'
-        }}
-        ref={() => setMapReady(true)}
-        id="central-map"
-      />
-    </>
+    <div style={{ height: '500px', width: '100%' }}>
+      <Map
+        google={props.google}
+        zoom={14}
+        style={mapStyles}
+        initialCenter={{ lat: 37.7749, lng: -122.4194 }} // San Francisco Coordinates
+      >
+        <Marker position={{ lat: 37.7749, lng: -122.4194 }} />
+      </Map>
+    </div>
   );
-}
+};
 
-export default RenderMap;
+export default GoogleApiWrapper({
+  apiKey: 'AlzaSybYgTc-Rii_b6CLjj_EVv2XrjoZRtGzLpc', 
+})(RenderMap);
+
