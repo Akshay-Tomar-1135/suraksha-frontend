@@ -30,12 +30,15 @@ const travelModes = {
 
 const RenderMap = () => {
   const [center, setCenter] = useState({
-    latitude: 36.7749,
-    longitude: -120.4194, 
+    latitude: 12.9981,
+    longitude: 77.6829, 
+
+    // 12.998153, 77.682944
+    // 12.969258, 77.749906
   });
   // const [source, setSource] = useState({ lat: 28.6139, lng: 77.2090 }); // Delhi
-  const [source, setSource] = useState({ lat: 19.0893, lng: 72.8778 }); // Delhi
-  const [destination, setDestination] = useState({ lat: 19.0760, lng: 72.8777 }); // Mumbai
+  const [source, setSource] = useState({ lat: 12.9981, lng: 77.6829 }); // Delhi
+  const [destination, setDestination] = useState({ lat: 12.9692, lng: 77.7499 }); // Mumbai
   const [travelType, setTravelType] = useState("DRIVING");
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [directionsResponse, setDirectionsResponse] = useState(null);
@@ -82,6 +85,7 @@ const RenderMap = () => {
   useEffect(() => {
     if (directionsResponse) {
       setRoutes(directionsResponse.routes);
+      // console.log("routest" , routes.length);
     }
   }, [directionsResponse]);
 
@@ -193,9 +197,10 @@ const RenderMap = () => {
               directions={directionsResponse}
               routeIndex={selectedRouteIndex}
               preserveViewport={false}
+              
             />
           )}
-
+          <div>asdfsadfasdfasdfasdfasdfasdfasdfaslkdfjfsalkfjklafjalsfjklasfjlaksjfklajflfj</div>{routes.length}
           {routes.length > 0 && (
             <div className="route-selection">
               <h2>Available Routes:</h2>

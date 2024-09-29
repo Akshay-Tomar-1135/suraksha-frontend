@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import RenderMap from 'src/components/map/RenderMap';
+import RenderMap2 from 'src/components/map/RenderMap2';
+import RenderMap3 from 'src/components/map/RenderMap3';
 import { AnalyticsNews } from '../analytics-news';
 import { AnalyticsTasks } from '../analytics-tasks';
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
@@ -13,6 +15,7 @@ import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
+
 
 
 // ----------------------------------------------------------------------
@@ -25,7 +28,9 @@ export function OverviewAnalyticsView() {
       </Typography> */}
 
 
-      <RenderMap/>
+      {/* <RenderMap/> */}
+      {/* <RenderMap2/> */}
+<RenderMap3/>
 
       {/* <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
