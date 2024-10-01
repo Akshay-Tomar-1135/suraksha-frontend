@@ -28,7 +28,7 @@ export function OverviewAnalyticsView() {
       </Typography> */}
 
 
-      {/* <RenderMap/> */}
+      <RenderMap/>
       {/* <RenderMap2/> */}
 <RenderMap3/>
 
