@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import {
   GoogleMap,
@@ -5,12 +6,85 @@ import {
   DirectionsService,
   DirectionsRenderer,
   useLoadScript,
+  Autocomplete
 } from '@react-google-maps/api';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-import { FaWalking, FaCar, FaMapMarkerAlt, FaAmbulance, FaFireExtinguisher, FaExclamationTriangle, FaPhoneAlt, FaLifeRing } from "react-icons/fa";  // Icons
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { FaWalking, FaCar, FaAmbulance, FaExclamationTriangle, FaPhoneAlt, FaSmile, FaFrown, FaMeh, FaGrinBeam, FaAngry} from "react-icons/fa";  // Icons
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Rating } from '@mui/material';  // Added Rating component
+
+const smileys = [
+  { label: "Worse", icon: <FaAngry size={50} color="red" /> },
+  { label: "Bad", icon: <FaFrown size={50} color="orange" /> },
+  { label: "Meh", icon: <FaMeh size={50} color="gray" /> },
+  { label: "Good", icon: <FaSmile size={50} color="green" /> },
+  { label: "Great", icon: <FaGrinBeam size={50} color="blue" /> },
+];
+
+const CustomSmileyRating = ({ rating, setRating }) => {
+  const handleKeyDown = (event, index) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setRating(index + 1);
+    }
+  };
+
+  const handleMouseEnter = (e) => {
+    e.currentTarget.style.transform = 'scale(1.1)'; // Slightly larger on hover
+  };
+
+  const handleMouseLeave = (e, index) => {
+    e.currentTarget.style.transform = index + 1 === rating ? 'scale(1.2)' : 'scale(1)';
+  };
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+      {smileys.map((smiley, index) => (
+        <div
+          key={index}
+          role="button"
+          tabIndex={0}
+          onClick={() => setRating(index + 1)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
+          style={{
+            textAlign: 'center',
+            cursor: 'pointer',
+            transform: index + 1 === rating ? 'scale(1.3)' : 'scale(1)', // Adjusted size for selected
+            transition: 'transform 0.3s ease', // Smooth transition
+          }}
+          aria-label={smiley.label}
+        >
+          <div
+            style={{
+              fontSize: '50px',
+              color: index + 1 === rating ? 'black' : 'gray',
+              transform: 'inherit', // Inherit the transform for hover and selected states
+            }}
+            onMouseEnter={handleMouseEnter} // Handle hover
+            onMouseLeave={(e) => handleMouseLeave(e, index)} // Reset to selected or default size
+          >
+            {smiley.icon}
+          </div>
+          <p
+            style={{
+              marginTop: '10px',
+              fontSize: '14px',
+              color: index + 1 === rating ? 'black' : 'gray',
+            }}
+          >
+            {smiley.label}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+CustomSmileyRating.propTypes = {
+  rating: PropTypes.number.isRequired, 
+  setRating: PropTypes.func.isRequired, 
+};
 
 const mapStyles = {
   width: '100%',
@@ -44,15 +118,20 @@ const RenderMap = () => {
   const [carNumber, setCarNumber] = useState('');
   const [isJourneyStarted, setIsJourneyStarted] = useState(false); // To track button state
   const [isModalOpen, setIsModalOpen] = useState(false); // To control modal visibility
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false); // To control rating modal visibility
+  const [rating, setRating] = useState(0); // For storing the user's rating
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false); // State for alert modal
+
 
   const startJourney = () => {
     if (!isJourneyStarted) {
       // Open the modal if the journey is being started
       setIsModalOpen(true);
     } else {
-      // If ending the journey
+      // If ending the journey, open rating modal
       setCarNumber("");
       setIsJourneyStarted(false); // End journey
+      setIsRatingModalOpen(true);  // Open rating modal
     }
   };
 
@@ -71,6 +150,11 @@ const RenderMap = () => {
       setIsJourneyStarted(true); // Start the journey
       setIsModalOpen(false); // Close modal
     }
+  };
+
+  const handleRatingSubmit = () => {
+    console.log(`Journey ended with a rating of: ${rating}`);
+    setIsRatingModalOpen(false);  // Close rating modal after submission
   };
 
   const handleTravelTypeChange = (type) => setTravelType(type.toUpperCase());
@@ -121,6 +205,50 @@ const RenderMap = () => {
 
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
+
+
+
+  
+  // Handle alert modal close
+  const handleAlertModalClose = () => {
+    setIsAlertModalOpen(false);
+  };
+
+  // Render alert modal
+  const renderAlertModal = () => (
+    <Dialog open={isAlertModalOpen} onClose={handleAlertModalClose} fullWidth maxWidth="sm">
+      <DialogTitle style={{ textAlign: 'center' }}>Select an Alert Action</DialogTitle>
+      <DialogContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row',  height: '300px' }}>
+        {[...Array(6)].map((_, index) => (
+          <button
+          type='button'
+            key={index}
+            style={{
+              width: '60px',
+              height: '60px',
+              backgroundColor: '#ffc107',
+              color: 'white',
+              borderRadius: '50%',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '18px',
+              margin: '5px',
+            }}
+          >
+             <FaPhoneAlt />
+          </button>
+        ))}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleAlertModalClose} color="primary">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   return (
     <>
@@ -194,7 +322,7 @@ const RenderMap = () => {
                 padding: '10px 20px',
                 border: 'none',
                 borderTop: '2px',
-                borderRadius: '5px',  // Make it a rectangle
+                borderRadius: '5px',  
                 cursor: 'pointer',
                 boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',  // Add shadow
                 transition: 'background-color 0.3s ease',  // Smooth transition
@@ -218,6 +346,7 @@ const RenderMap = () => {
 
         </div>
 
+        {/* Journey details modal */}
         <Dialog open={isModalOpen} onClose={handleModalClose} fullWidth maxWidth="sm" PaperProps={{ style: { height: '400px' } }}>
           <DialogTitle style={{textAlign: 'center'}}>Journey details</DialogTitle>
           <DialogContent style={{ height: '300px' }}>
@@ -239,6 +368,22 @@ const RenderMap = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Rating modal after journey ends */}
+        <Dialog open={isRatingModalOpen} onClose={() => setIsRatingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ style: { height: '400px' } }}>
+        <DialogTitle style={{ textAlign: 'center' }}>Rate your journey</DialogTitle>
+        <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: '300px' }}>
+          <CustomSmileyRating rating={rating} setRating={setRating} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsRatingModalOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleRatingSubmit} color="primary">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
       </div>
 
       <div style={mapStyles}>
@@ -299,7 +444,6 @@ const RenderMap = () => {
           )}
         </GoogleMap>
 
-        {/* Spherical buttons on the right side */}
         <div style={{ position: 'absolute', right: '15px', top: '40%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button
           type='button'
@@ -317,8 +461,7 @@ const RenderMap = () => {
               fontSize: '18px',
             }}
           >
-            {/* <FaCar /> */}
-            <FaAmbulance/>
+            <FaAmbulance />
           </button>
 
           <button
@@ -337,13 +480,11 @@ const RenderMap = () => {
               fontSize: '18px',
             }}
           >
-            {/* <FaWalking /> */}
-            {/* <FaExclamationTriangle/>
-           */}
-          <FaPhoneAlt/>
+            <FaPhoneAlt />
           </button>
 
           <button
+         onClick={() => setIsAlertModalOpen(true)} 
            type='button'
             style={{
               width: '60px',
@@ -359,9 +500,10 @@ const RenderMap = () => {
               fontSize: '18px',
             }}
           >
-            <FaExclamationTriangle/>
+            <FaExclamationTriangle />
           </button>
         </div>
+        {renderAlertModal()}
       </div>
     </>
   );
