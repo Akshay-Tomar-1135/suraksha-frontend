@@ -75,6 +75,7 @@ function RenderMap() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const mapRef = useRef(null); // Use ref for map instance
   const markerRef = useRef(null); // Ref for marker
+  // const [error, setError] = useState(null);
 
   // Function to fetch the location
   const fetchLocation = () => {

@@ -18,6 +18,11 @@ export const navData = [
     path: '/user',
     icon: icon('ic-user'),
   },
+  {
+    title: 'Locations',
+    path: '/location',
+    icon: icon('ic-location'),
+  },
   // {
   //   title: 'Product',
   //   path: '/products',
