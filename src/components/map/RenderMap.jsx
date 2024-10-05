@@ -6,20 +6,43 @@ import {
   DirectionsService,
   DirectionsRenderer,
   useLoadScript,
-  Autocomplete
+  Autocomplete,
 } from '@react-google-maps/api';
-import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-import { FaWalking, FaCar, FaAmbulance, FaExclamationTriangle, FaPhoneAlt, FaSmile, FaFrown, FaMeh, FaGrinBeam, FaAngry} from "react-icons/fa";  // Icons
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Rating } from '@mui/material';  // Added Rating component
+import {
+  FaWalking,
+  FaCar,
+  FaAmbulance,
+  FaExclamationTriangle,
+  FaPhoneAlt,
+  FaSmile,
+  FaFrown,
+  FaMeh,
+  FaGrinBeam,
+  FaAngry,
+} from 'react-icons/fa'; // Icons
+import {
+  DialogActions,
+  Button,
+  Rating,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from '@mui/material'; // Added Rating component
+import { Label } from '../label';
 
 const smileys = [
-  { label: "Worse", icon: <FaAngry size={50} color="red" /> },
-  { label: "Bad", icon: <FaFrown size={50} color="orange" /> },
-  { label: "Meh", icon: <FaMeh size={50} color="gray" /> },
-  { label: "Good", icon: <FaSmile size={50} color="green" /> },
-  { label: "Great", icon: <FaGrinBeam size={50} color="blue" /> },
+  { label: 'Worse', icon: <FaAngry size={50} color="red" /> },
+  { label: 'Bad', icon: <FaFrown size={50} color="orange" /> },
+  { label: 'Meh', icon: <FaMeh size={50} color="gray" /> },
+  { label: 'Good', icon: <FaSmile size={50} color="green" /> },
+  { label: 'Great', icon: <FaGrinBeam size={50} color="blue" /> },
 ];
 
 const CustomSmileyRating = ({ rating, setRating }) => {
@@ -82,35 +105,41 @@ const CustomSmileyRating = ({ rating, setRating }) => {
 };
 
 CustomSmileyRating.propTypes = {
-  rating: PropTypes.number.isRequired, 
-  setRating: PropTypes.func.isRequired, 
+  rating: PropTypes.number.isRequired,
+  setRating: PropTypes.func.isRequired,
 };
 
 const mapStyles = {
   width: '100%',
-  height: '80vh',
-  border: '2px solid black',
+  height: '75vh',
+  border: '0.5px solid black',
   position: 'relative',
+  borderRadius:"10px",
+  backgroundColor: 'white',
 };
 
 const mapContainerStyle = {
   height: '100%',
   width: '100%',
+  borderRadius:"10px",
 };
 
 const travelModes = {
-  driving: { icon: FaCar, color: "blue" },
-  walking: { icon: FaWalking, color: "green" },
+  driving: { icon: FaCar, color: 'blue' },
+  walking: { icon: FaWalking, color: 'green' },
 };
 
 const RenderMap = () => {
   const [center, setCenter] = useState({
     latitude: 12.9981,
-    longitude: 77.6829, 
+    longitude: 77.6829,
   });
+  // const [source, setSource] = useState();
+  const [sourceName, setSourceName] = useState("");
   const [source, setSource] = useState({ lat: 12.9981, lng: 77.6829 });
   const [destination, setDestination] = useState({ lat: 12.9692, lng: 77.7499 });
-  const [travelType, setTravelType] = useState("DRIVING");
+  const [destinationName, setDestinationName] = useState("");
+  const [travelType, setTravelType] = useState('DRIVING');
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [routes, setRoutes] = useState([]);
@@ -122,16 +151,15 @@ const RenderMap = () => {
   const [rating, setRating] = useState(0); // For storing the user's rating
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false); // State for alert modal
 
-
   const startJourney = () => {
     if (!isJourneyStarted) {
       // Open the modal if the journey is being started
       setIsModalOpen(true);
     } else {
       // If ending the journey, open rating modal
-      setCarNumber("");
+      setCarNumber('');
       setIsJourneyStarted(false); // End journey
-      setIsRatingModalOpen(true);  // Open rating modal
+      setIsRatingModalOpen(true); // Open rating modal
     }
   };
 
@@ -151,21 +179,33 @@ const RenderMap = () => {
       setIsModalOpen(false); // Close modal
     }
   };
+  const handleSubmitCarNumberSkip = () => {
+    // if (carNumber) {
+    setIsJourneyStarted(true); // Start the journey
+    setIsModalOpen(false); // Close modal
+    // }
+  };
 
   const handleRatingSubmit = () => {
     console.log(`Journey ended with a rating of: ${rating}`);
-    setIsRatingModalOpen(false);  // Close rating modal after submission
+    setIsRatingModalOpen(false); // Close rating modal after submission
   };
 
   const handleTravelTypeChange = (type) => setTravelType(type.toUpperCase());
 
-  const handleSourceChange = (e) => setSource(e.target.value);
-  const handleDestinationChange = (e) => setDestination(e.target.value);
-  const clearSourceInput = () => setSource("");
-  const clearDestInput = () => setDestination("");
+  const handleSourceChange = (e) => setSourceName(e.target.value);
+  const handleDestinationChange = (e) => setDestinationName(e.target.value);
+  const clearSourceInput = () => setSourceName('');
+  const clearDestInput = () => setDestinationName('');
+
+  const [safetyTimer, setSafetyTimer] = useState('');
+
+  const handleSafetyTimerChange = (event) => {
+    setSafetyTimer(event.target.value);
+  };
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AlzaSybYgTc-Rii_b6CLjj_EVv2XrjoZRtGzLpc'
+    googleMapsApiKey: 'AlzaSybYgTc-Rii_b6CLjj_EVv2XrjoZRtGzLpc',
   });
 
   const fetchLocation = () => {
@@ -181,7 +221,7 @@ const RenderMap = () => {
         }
       );
     } else {
-      console.error("Geolocation is not supported by this browser.");
+      console.error('Geolocation is not supported by this browser.');
     }
   };
 
@@ -206,9 +246,6 @@ const RenderMap = () => {
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
 
-
-
-  
   // Handle alert modal close
   const handleAlertModalClose = () => {
     setIsAlertModalOpen(false);
@@ -217,31 +254,64 @@ const RenderMap = () => {
   // Render alert modal
   const renderAlertModal = () => (
     <Dialog open={isAlertModalOpen} onClose={handleAlertModalClose} fullWidth maxWidth="sm">
-      <DialogTitle style={{ textAlign: 'center' }}>Select an Alert Action</DialogTitle>
-      <DialogContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row',  height: '300px' }}>
-        {[...Array(6)].map((_, index) => (
-          <button
-          type='button'
+      <DialogTitle style={{ textAlign: 'center' }}>Send an Alert Call</DialogTitle>
+
+      <DialogContent
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          height: '150px',
+        }}
+      >
+        {['Home', 'Hospital', 'Police', 'Fire Station'].map((place, index) => (
+          <div
             key={index}
             style={{
-              width: '60px',
-              height: '60px',
-              backgroundColor: '#ffc107',
-              color: 'white',
-              borderRadius: '50%',
-              border: 'none',
-              cursor: 'pointer',
               display: 'flex',
-              justifyContent: 'center',
+              flexDirection: 'column',
               alignItems: 'center',
-              fontSize: '18px',
-              margin: '5px',
+              // flexBasis: '33%', // Ensures two buttons per row
+              marginBottom: '15px', // Space between rows
             }}
           >
-             <FaPhoneAlt />
-          </button>
+            <button
+              type="button"
+              style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'green',
+                color: 'white',
+                borderRadius: '50%',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '18px',
+                transition: 'transform 0.3s ease', // Smooth transition for scaling
+              }}
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.2)'; // Enlarge the button on hover
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)'; // Return to normal size when hover ends
+              }}
+              onBlur={(e) => {
+                e.target.style.transform = 'scale(1)';
+              }}
+              onFocus={(e) => {
+                e.target.style.transform = 'scale(1.2)';
+              }}
+            >
+              <FaPhoneAlt />
+            </button>
+            <span style={{ marginTop: '5px', fontSize: '14px', textAlign: 'center' }}>{place}</span>
+          </div>
         ))}
       </DialogContent>
+
       <DialogActions>
         <Button onClick={handleAlertModalClose} color="primary">
           Close
@@ -252,13 +322,38 @@ const RenderMap = () => {
 
   return (
     <>
-      <div className="box" style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <div className="input-container" style={{ display: 'flex', justifyContent: 'space-between', width: '92%' }}>
+    <div  style={{
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection:"column",
+          marginBottom: '20px',
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '17px',
+        }}>
+      <div
+        className="box"
+        style={{
+          display: 'flex',
+          justifyContent:"space-between",
+          alignItems: 'center',
+          marginBottom: '20px',
+          width:"90%",
+          // border:"2px solid black",
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '17px',
+        }}
+      >
+        <div
+          className="input-container"
+          style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%' }}
+        >
           <div className="field" style={{ flex: 1, marginRight: '10px' }}>
             <TextField
               label="Source (lng, lat)"
               variant="outlined"
-              value={`${source.lng}, ${source.lat}`}
+              value={sourceName}
               onChange={handleSourceChange}
               fullWidth
               InputProps={{
@@ -275,7 +370,7 @@ const RenderMap = () => {
             <TextField
               label="Destination (lng, lat)"
               variant="outlined"
-              value={`${destination.lng}, ${destination.lat}`}
+              value={destinationName}
               onChange={handleDestinationChange}
               fullWidth
               InputProps={{
@@ -288,7 +383,7 @@ const RenderMap = () => {
             />
           </div>
 
-          <div style={{ display: "flex", gap: "15px", alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             {Object.keys(travelModes).map((mode) => {
               const Icon = travelModes[mode].icon;
               return (
@@ -297,12 +392,13 @@ const RenderMap = () => {
                   type="button"
                   onClick={() => handleTravelTypeChange(mode)}
                   style={{
-                    backgroundColor: travelType === mode.toUpperCase() ? travelModes[mode].color : "gray",
-                    color: "white",
-                    border: "none",
-                    padding: "10px",
-                    borderRadius: "50%",
-                    cursor: "pointer",
+                    backgroundColor:
+                      travelType === mode.toUpperCase() ? travelModes[mode].color : 'gray',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
                   }}
                 >
                   <Icon />
@@ -312,43 +408,47 @@ const RenderMap = () => {
           </div>
 
           {/* Start/End Journey Button */}
-          <div style={{ marginLeft: '15px' }}>
+          <div style={{ marginLeft: '25px' }}>
             <button
               type="button"
               onClick={startJourney}
               style={{
-                backgroundColor: isJourneyStarted ? 'red' : 'green', // Green if not started, red if started
+                backgroundColor: isJourneyStarted ? 'red' : 'black', // Black if not started, red if started
                 color: 'white',
                 padding: '10px 20px',
                 border: 'none',
-                borderTop: '2px',
-                borderRadius: '5px',  
+                borderRadius: '5px',
                 cursor: 'pointer',
-                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',  // Add shadow
-                transition: 'background-color 0.3s ease',  // Smooth transition
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Add shadow
+                transition: 'background-color 0.3s ease', // Smooth transition
               }}
               onMouseOver={(e) => {
-                e.target.style.backgroundColor = isJourneyStarted ? '#cc0000' : '#00cc00';  // Darker on hover
+                e.target.style.backgroundColor = isJourneyStarted ? '#cc0000' : '#333333'; // Darker red if started, dark gray if not started
               }}
               onMouseOut={(e) => {
-                e.target.style.backgroundColor = isJourneyStarted ? 'red' : 'green';  // Original color
+                e.target.style.backgroundColor = isJourneyStarted ? 'red' : 'black'; // Original color
               }}
               onFocus={(e) => {
-                e.target.style.backgroundColor = isJourneyStarted ? '#cc0000' : '#00cc00';  // Same as onMouseOver for focus
+                e.target.style.backgroundColor = isJourneyStarted ? '#cc0000' : '#333333'; // Same as onMouseOver for focus
               }}
               onBlur={(e) => {
-                e.target.style.backgroundColor = isJourneyStarted ? 'red' : 'green';  // Same as onMouseOut for blur
+                e.target.style.backgroundColor = isJourneyStarted ? 'red' : 'black'; // Same as onMouseOut for blur
               }}
             >
               {isJourneyStarted ? 'End Journey' : 'Start Journey'}
             </button>
           </div>
-
         </div>
 
         {/* Journey details modal */}
-        <Dialog open={isModalOpen} onClose={handleModalClose} fullWidth maxWidth="sm" PaperProps={{ style: { height: '400px' } }}>
-          <DialogTitle style={{textAlign: 'center'}}>Journey details</DialogTitle>
+        <Dialog
+          open={isModalOpen}
+          onClose={handleModalClose}
+          fullWidth
+          maxWidth="sm"
+          PaperProps={{ style: { height: '400px' } }}
+        >
+          <DialogTitle style={{ textAlign: 'center' }}>Journey details</DialogTitle>
           <DialogContent style={{ height: '300px' }}>
             <TextField
               label="Car Number"
@@ -356,12 +456,43 @@ const RenderMap = () => {
               value={carNumber}
               onChange={handleCarNumberChange}
               fullWidth
-              style={{marginTop: '5px'}}
+              style={{ marginTop: '10px' }}
             />
+            <TextField
+              label="Car Model"
+              variant="outlined"
+              value={carNumber}
+              onChange={handleCarNumberChange}
+              fullWidth
+              style={{ marginTop: '5px' }}
+            />
+            <TextField
+              label="Car Color"
+              variant="outlined"
+              value={carNumber}
+              onChange={handleCarNumberChange}
+              fullWidth
+              style={{ marginTop: '5px' }}
+            />
+            <FormControl fullWidth style={{ marginTop: '15px' }}>
+              <InputLabel id="safety-timer-label">Check Safety Timer</InputLabel>
+              <Select
+                labelId="safety-timer-label"
+                value={safetyTimer}
+                onChange={handleSafetyTimerChange}
+                variant="outlined"
+                label="Check Safety Timer"
+              >
+                <MenuItem value={0}>No Reminder</MenuItem>
+                <MenuItem value={5}>Every 5 minutes</MenuItem>
+                <MenuItem value={10}>Every 10 minutes</MenuItem>
+                <MenuItem value={15}>Every 15 minutes</MenuItem>
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleModalClose} color="primary">
-              Cancel
+            <Button onClick={handleSubmitCarNumberSkip} color="error">
+              Skip
             </Button>
             <Button onClick={handleSubmitCarNumber} color="primary">
               Submit
@@ -370,20 +501,32 @@ const RenderMap = () => {
         </Dialog>
 
         {/* Rating modal after journey ends */}
-        <Dialog open={isRatingModalOpen} onClose={() => setIsRatingModalOpen(false)} fullWidth maxWidth="sm" PaperProps={{ style: { height: '400px' } }}>
-        <DialogTitle style={{ textAlign: 'center' }}>Rate your journey</DialogTitle>
-        <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: '300px' }}>
-          <CustomSmileyRating rating={rating} setRating={setRating} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsRatingModalOpen(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleRatingSubmit} color="primary">
-            Submit
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog
+          open={isRatingModalOpen}
+          onClose={() => setIsRatingModalOpen(false)}
+          PaperProps={{ style: { height: '300px', width: '500px' } }}
+        >
+          <DialogTitle style={{ textAlign: 'center' }}>Rate your journey</DialogTitle>
+          <DialogContent
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+              height: '300px',
+            }}
+          >
+            <CustomSmileyRating rating={rating} setRating={setRating} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsRatingModalOpen(false)} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleRatingSubmit} color="primary">
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
 
       <div style={mapStyles}>
@@ -409,7 +552,7 @@ const RenderMap = () => {
             <DirectionsService
               options={{
                 origin: source,
-                destination, 
+                destination,
                 travelMode: window.google.maps.TravelMode[travelType],
                 provideRouteAlternatives: true,
               }}
@@ -431,10 +574,7 @@ const RenderMap = () => {
               <ul>
                 {routes.map((route, index) => (
                   <li key={index}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRouteIndex(index)}
-                    >
+                    <button type="button" onClick={() => setSelectedRouteIndex(index)}>
                       {route.summary}
                     </button>
                   </li>
@@ -444,9 +584,18 @@ const RenderMap = () => {
           )}
         </GoogleMap>
 
-        <div style={{ position: 'absolute', right: '15px', top: '40%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div
+          style={{
+            position: 'absolute',
+            right: '15px',
+            top: '40%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+          }}
+        >
           <button
-          type='button'
+            type="button"
             style={{
               width: '60px',
               height: '60px',
@@ -465,7 +614,7 @@ const RenderMap = () => {
           </button>
 
           <button
-           type='button'
+            type="button"
             style={{
               width: '60px',
               height: '60px',
@@ -484,8 +633,8 @@ const RenderMap = () => {
           </button>
 
           <button
-         onClick={() => setIsAlertModalOpen(true)} 
-           type='button'
+            onClick={() => setIsAlertModalOpen(true)}
+            type="button"
             style={{
               width: '60px',
               height: '60px',
@@ -505,6 +654,7 @@ const RenderMap = () => {
         </div>
         {renderAlertModal()}
       </div>
+    </div>
     </>
   );
 };
