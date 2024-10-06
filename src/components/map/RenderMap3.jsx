@@ -129,7 +129,7 @@ export default RenderMap3;
 //     if (!place) return;
   
 //     try {
-//       const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+//       const response = await axios.get(`https://maps.gomaps.pro/maps/api/geocode/json`, {
 //         params: {
 //           address: place,
 //           key: 'YOUR_API_KEY', // Replace with your API key

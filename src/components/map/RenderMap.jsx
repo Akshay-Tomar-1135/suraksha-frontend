@@ -108,7 +108,7 @@ const RenderMap = () => {
     latitude: 12.9981,
     longitude: 77.6829, 
   });
-  const [source, setSource] = useState({ lat: 12.9981, lng: 77.6829 });
+  const [source, setSource] = useState({ lat: 12.9881, lng: 77.6829 });
   const [destination, setDestination] = useState({ lat: 12.9692, lng: 77.7499 });
   const [travelType, setTravelType] = useState("DRIVING");
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -121,6 +121,10 @@ const RenderMap = () => {
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false); // To control rating modal visibility
   const [rating, setRating] = useState(0); // For storing the user's rating
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false); // State for alert modal
+  const selected = routes[selectedRouteIndex];
+  const leg = selected?.legs[0];
+  const routeColors = ['red', 'green', 'blue', 'yellow', 'orange']; // Add more colors if needed
+  const [selectedRouteSummary, setSelectedRouteSummary] = useState(null); // To display the clicked route summary
 
 
   const startJourney = () => {
@@ -193,9 +197,26 @@ const RenderMap = () => {
 
   useEffect(() => {
     if (directionsResponse) {
-      setRoutes(directionsResponse.routes);
+            setRoutes(directionsResponse.routes);
     }
-  }, [directionsResponse]);
+  }, [directionsResponse]);  
+
+  // Handle route clicks and set the selected route summary
+  const handleRouteClick = (route, index) => {
+    setSelectedRouteIndex(index);
+    
+    // Extract details from the first leg of the route (start to end)
+    const distance = route.legs[0].distance.text;  // Distance in a human-readable format
+    const duration = route.legs[0].duration.text;  // Duration in a human-readable format
+    const summary = route.summary;  // Route summary
+    
+    // Set a detailed summary with distance and duration
+    setSelectedRouteSummary({
+      summary,
+      distance,
+      duration,
+    });
+  };
 
   const handleDirectionsCallback = (response, status) => {
     if (status === 'OK' && response) {
@@ -387,62 +408,63 @@ const RenderMap = () => {
       </div>
 
       <div style={mapStyles}>
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          zoom={3}
-          center={source || center}
-          options={{
-            gestureHandling: 'greedy',
-            zoomControl: true,
-          }}
-        >
-          {location.latitude !== null && location.longitude !== null && (
-            <Marker
-              position={{ lat: location.latitude, lng: location.longitude }}
-              label="You are here!"
-            />
-          )}
-          <Marker position={center} label="S" />
-          <Marker position={destination} label="D" />
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={source || center}
+        options={{
+          gestureHandling: 'greedy',
+          zoomControl: true,
+        }}
+      >
+        {location.latitude !== null && location.longitude !== null && (
+          <Marker
+            position={{ lat: location.latitude, lng: location.longitude }}
+            label="You are here!"
+          />
+        )}
+        <Marker position={center} label="S" />
+        <Marker position={destination} label="D" />
 
-          {source && destination && isLoaded && (
-            <DirectionsService
-              options={{
-                origin: source,
-                destination, 
-                travelMode: window.google.maps.TravelMode[travelType],
-                provideRouteAlternatives: true,
-              }}
-              callback={handleDirectionsCallback}
-            />
-          )}
+        {source && destination && isLoaded && (
+          <DirectionsService
+            options={{
+              origin: source,
+              destination,
+              travelMode: window.google.maps.TravelMode[travelType],
+              provideRouteAlternatives: true,
+            }}
+            callback={handleDirectionsCallback}
+          />
+        )}
 
-          {directionsResponse && (
+        {/* Map through routes and render all of them */}
+        {routes &&
+          routes.map((route, index) => (
             <DirectionsRenderer
-              directions={directionsResponse}
-              routeIndex={selectedRouteIndex}
-              preserveViewport={false}
+              key={index}
+              directions={{ ...directionsResponse, routes: [route] }} // Render individual route
+              options={{
+                polylineOptions: {
+                  strokeColor: routeColors[index % routeColors.length], // Use distinct color for each route
+                  strokeOpacity: 0.7,
+                  strokeWeight: 5,
+                  clickable: true, // Enable clicking on the route polyline
+                },
+                preserveViewport: true, // Keep the current map view
+              }}
+              onClick={() => handleRouteClick(route, index)} // Handle click on the route
             />
-          )}
+          ))}
+      </GoogleMap>
 
-          {routes.length > 0 && (
-            <div className="route-selection">
-              <h2>Available Routes:</h2>
-              <ul>
-                {routes.map((route, index) => (
-                  <li key={index}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRouteIndex(index)}
-                    >
-                      {route.summary}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </GoogleMap>
+        {selectedRouteSummary && (
+        <div style={{ position: 'absolute', top: 10, left: 10, padding: '10px', backgroundColor: 'white', borderRadius: '5px' }}>
+          <h4>Selected Route Summary</h4>
+          <p><strong>Summary:</strong> {selectedRouteSummary.summary}</p>
+          <p><strong>Distance:</strong> {selectedRouteSummary.distance}</p>
+          <p><strong>Duration:</strong> {selectedRouteSummary.duration}</p>
+        </div>
+      )}
 
         <div style={{ position: 'absolute', right: '15px', top: '40%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button
