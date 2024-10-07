@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MapLibreGlDirections, {
   LoadingIndicatorControl,
 } from "@maplibre/maplibre-gl-directions";
@@ -17,6 +17,7 @@ function RenderMap() {
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [travelType, setTravelType] = useState("driving");
+  const [error, setError] = useState(null); // Define error state
 
   const travelModes = {
     walking: { icon: FaWalking, color: "#4CAF50" },
@@ -77,11 +78,11 @@ function RenderMap() {
       showCompass: true,
     });
 
-    map.addControl(nav, "top-left");
-    new Marker().setLngLat([77.5353394, 16.03106]).addTo(map);
+    mapInstance.addControl(nav, "top-left");
+    new Marker().setLngLat([77.5353394, 16.03106]).addTo(mapInstance);
 
-    map.on("load", () => {
-      const directions = new MapLibreGlDirections(map);
+    mapInstance.on("load", () => {
+      const directions = new MapLibreGlDirections(mapInstance);
       directions.interactive = true;
       mapInstance.addControl(new LoadingIndicatorControl(directions));
       directions.removeWaypoint(0);
@@ -192,7 +193,7 @@ function RenderMap() {
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
           position: 'relative',
         }}
-        ref={() => setMapReady(true)}
+        ref={mapRef}
         id="central-map"
       />
 
