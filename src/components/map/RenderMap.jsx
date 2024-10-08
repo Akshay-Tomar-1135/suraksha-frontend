@@ -6,7 +6,7 @@ import {
   DirectionsService,
   DirectionsRenderer,
   useLoadScript,
-  Autocomplete,
+  Polyline
 } from '@react-google-maps/api';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -135,6 +135,7 @@ const RenderMap = () => {
     longitude: 77.6829,
   });
   const [source, setSource] = useState({ lat: 12.9881, lng: 77.6829 });
+  const [sourceName, setSourceName] = useState("");
   const [destination, setDestination] = useState({ lat: 12.9692, lng: 77.7499 });
   const [destinationName, setDestinationName] = useState("");
   const [travelType, setTravelType] = useState('DRIVING');
@@ -241,13 +242,16 @@ const RenderMap = () => {
 
   // Handle route clicks and set the selected route summary
   const handleRouteClick = (route, index) => {
+    console.log("sdfjsflajflasfjalfjas;lfjaklsf");
     setSelectedRouteIndex(index);
     
     // Extract details from the first leg of the route (start to end)
     const distance = route.legs[0].distance.text;  // Distance in a human-readable format
     const duration = route.legs[0].duration.text;  // Duration in a human-readable format
     const summary = route.summary;  // Route summary
-    
+    console.log("asdf", distance);
+    console.log("asasdfdf", duration);
+    console.log("asasdfdf", summary);
     // Set a detailed summary with distance and duration
     setSelectedRouteSummary({
       summary,
@@ -268,6 +272,15 @@ const RenderMap = () => {
   // Handle alert modal close
   const handleAlertModalClose = () => {
     setIsAlertModalOpen(false);
+  };
+
+  const handleDirectionsRendererReady = (directionsRenderer, route, index) => {
+    const polyline = directionsRenderer.getDirections().routes[0].overview_path; // Extract polyline path
+      console.log("asfdadfasfdasdfasdf");
+    // Add click listener to the polyline
+    // google.maps.event.addListener(directionsRenderer.getDirections().routes[0].overview_polyline, 'click', () => {
+    //   handleRouteClick(route, index);
+    // });
   };
 
   // Render alert modal
@@ -589,11 +602,12 @@ const RenderMap = () => {
                   strokeColor: routeColors[index % routeColors.length], // Use distinct color for each route
                   strokeOpacity: 0.7,
                   strokeWeight: 5,
-                  clickable: true, // Enable clicking on the route polyline
+                  clickable: true, 
                 },
                 preserveViewport: true, // Keep the current map view
               }}
-              onClick={() => handleRouteClick(route, index)} // Handle click on the route
+              // onLoad={() => handleRouteClick(route, index)} // Handle click on the route
+              onLoad={directionsRenderer => handleDirectionsRendererReady(directionsRenderer, route, index)} 
             />
           ))}
       </GoogleMap>
