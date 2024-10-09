@@ -12,7 +12,7 @@ import Avatar9 from '/assets/images/avatar/avatar-9.webp';
 
 export default function Testimonials() {
   return (
-    <div className="pt-12">
+    <div className="pt-12" id="customers">
       <div className="flex flex-col items-center px-28 pb-16">
         <div className="border-2 w-fit p-0.5 px-3 text-sm rounded-xl font-semibold border-[#6a0dad]/80">
           Testimonials

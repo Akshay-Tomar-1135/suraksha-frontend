@@ -24,19 +24,19 @@ const Header = () => {
       <nav className="hidden md:block">
         <ul className="flex gap-6 items-center">
           <li>
-            <a href="#">About</a>
+            <a href="#about">About</a>
           </li>
           <li>
-            <a href="#">Features</a>
+            <a href="#features">Features</a>
           </li>
           <li>
-            <a href="#">Customers</a>
+            <a href="#customers">Customers</a>
           </li>
           <li>
-            <a href="#">Feedback</a>
+            <a href="#faq">FAQ</a>
           </li>
           <li>
-            <a href="#">Help</a>
+            <a href="#feedback">Feedback</a>
           </li>
           <Button text="Get Started" onButtonClick={() => router.push('/auth')} />
         </ul>
@@ -47,19 +47,19 @@ const Header = () => {
         <nav className="md:hidden absolute top-full left-0 w-full bg-gradient-to-r from-[#E0E7FD] to-[#FDFEFF] shadow-md">
           <ul className="flex flex-col gap-4 p-6">
             <li>
-              <a href="#">About</a>
+              <a href="#about">About</a>
             </li>
             <li>
-              <a href="#">Features</a>
+              <a href="#features">Features</a>
             </li>
             <li>
-              <a href="#">Customers</a>
+              <a href="#customers">Customers</a>
             </li>
             <li>
-              <a href="#">Feedback</a>
+              <a href="#faq">FAQ</a>
             </li>
             <li>
-              <a href="#">Help</a>
+              <a href="#feedback">Feedback</a>
             </li>
             <Button text="Get Started" onButtonClick={() => router.push('/auth')} />
           </ul>

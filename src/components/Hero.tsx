@@ -29,6 +29,7 @@ const Hero = () => {
     <section
       ref={heroRef}
       className="p-8 pb-16 md:p-10 lg:p-20 font-medium bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] overflow-x-clip md:items-center gap-3"
+      id="about"
     >
       <div className="md:flex items-center justify-center gap-16">
         <div className="md:w-[478px]">

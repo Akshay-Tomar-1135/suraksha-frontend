@@ -23,6 +23,7 @@ const ProductShowcase = () => {
     <div
       ref={sectionRef}
       className="bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] flex flex-col items-center overflow-x-hidden pb-24"
+      id="features"
     >
       <div className="flex flex-col items-center font-medium mt-24 px-8 mx-auto md:w-[550px] lg:w-[630px]">
         <div className="border-2 w-fit p-0.5 px-3 text-sm rounded-xl border-[#6a0dad]/80">
