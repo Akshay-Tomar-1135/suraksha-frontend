@@ -27,13 +27,16 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-12 px-8 sm:px-10 md:px-12 bg-gradient-to-t from-[#e0f2ff] to-[#a0c8f0] text-black">
+    <section
+      id="faq"
+      className="py-12 px-4 sm:px-6 md:px-8 lg:px-10 bg-gradient-to-t from-[#e0f2ff] to-[#a0c8f0] text-black"
+    >
       <div className="flex flex-col items-center max-w-5xl mx-auto">
-        <div className="text-4xl md:text-5xl lg:text-6xl pt-6 font-bold tracking-tighter mb-8 text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
+        <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl pt-6 font-bold tracking-tighter mb-8 text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
           Frequently Asked Questions
         </div>
 
-        <div className="w-full sm:w-4/5 md:w-3/4 lg:w-2/3 space-y-6">
+        <div className="w-full space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
@@ -44,7 +47,7 @@ const FAQSection = () => {
               <button
                 type="button"
                 onClick={() => toggleAccordion(index)}
-                className="w-full text-left py-4 px-6 font-semibold text-xl flex justify-between items-center transition-colors duration-300 hover:bg-slate-200 rounded-t-md"
+                className="w-full text-left py-2 px-4 sm:px-6 font-semibold text-lg sm:text-xl flex justify-between items-center transition-colors duration-300 hover:bg-slate-200 rounded-t-md"
               >
                 {faq.question}
                 <span className="text-2xl transition-transform duration-300">
@@ -56,7 +59,7 @@ const FAQSection = () => {
                   activeIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="px-6 py-4 bg-slate-100 text-black rounded-b-md">
+                <div className="px-4 py-2 sm:px-6 sm:py-3 bg-slate-100 text-black rounded-b-md">
                   {faq.answer}
                 </div>
               </div>
