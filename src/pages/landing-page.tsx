@@ -7,6 +7,7 @@ import Testimonials from "src/components/Testimonials";
 import FeedbackForm from "src/components/Feedback"
 import FAQSection from "src/components/FAQ";
 
+
 export default function LandingPage() {
   return (
     <>
@@ -17,7 +18,7 @@ export default function LandingPage() {
       <Testimonials/>
       <FAQSection />
       <FeedbackForm />
-      <Footer/>
+      <Footer />
     </>
   );
 }
