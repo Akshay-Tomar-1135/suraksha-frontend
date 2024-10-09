@@ -84,17 +84,17 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
   const handleEditUser = async () => {
     if (validateFields()) {
       try {
-        // Calling API to update user contact
+        
         const result = await updateUserContact(user.role, {
           name,
           company,
-          relation: '', // Add relation field if needed
-          new_phone_number: role, // Assuming role is phone number
-          email: '', // Add email if available
+          relation: '', 
+          new_phone_number: role,
+          email: '', 
           status,
-          priority: 1, // Provide the required priority value
-          latitude: 0, // Provide latitude if available
-          longitude: 0, // Provide longitude if available
+          priority: 1, 
+          latitude: 0, 
+          longitude: 0, 
         });
 
         if (result.success) {
@@ -208,7 +208,7 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
     open={snackbarOpen}
     autoHideDuration={3000}
     onClose={handleSnackbarClose}
-  >
+    >
     <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
       {snackbarMessage}
     </Alert>
@@ -228,7 +228,7 @@ async function updateUserContact(oldPhoneNumber: string, updatedContactData: any
         phone_number: oldPhoneNumber, // Old phone number
         aadhaar_number: 123456789,
         name: updatedContactData.name,
-        relation: updatedContactData.relation,
+        relation: updatedContactData.company,
         new_phone_number: updatedContactData.new_phone_number, // New phone number
         email: updatedContactData.email,
         status: updatedContactData.status,

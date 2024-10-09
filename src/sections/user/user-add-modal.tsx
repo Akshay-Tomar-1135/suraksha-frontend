@@ -47,15 +47,15 @@ async function addUserContact(contact: any): Promise<Response> { // Return the r
 
 export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
   const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
+  const [relation, setRelation] = useState('');
+  const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
 
   const [errors, setErrors] = useState({
     name: false,
-    company: false,
-    role: false,
+    relation: false,
+    phone: false,
     status: false,
     email: false
   });
@@ -67,14 +67,14 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
 
   const handleClose = () => {
     setName('');
-    setCompany('');
-    setRole('');
+    setRelation('');
+    setPhone('');
     setStatus('');
     setEmail('');
     setErrors({
       name: false,
-      company: false,
-      role: false,
+      relation: false,
+      phone: false,
       status: false,
       email: false,
     });
@@ -90,8 +90,8 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
   const validateFields = () => {
     const newErrors = {
       name: name.trim() === '',
-      company: company.trim() === '',
-      role: role.trim() === '',
+      relation: relation.trim() === '',
+      phone: phone.trim() === '',
       status: status.trim() === '',
       email: email.trim() === '',
     };
@@ -106,15 +106,15 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
   const handleAddUser = async () => {
     if (validateFields()) {
       const newUserContact = {
-        aadhaar_number: 123456789, // Hardcoded or dynamic value
+        aadhaar_number: 123456789, // Hardcoded 
         name,
-        relation: company,
-        phone_number: role,
+        relation,
+        phone_number: phone,
         email,
         status,
-        priority: 1, // Add a default priority value
-        latitude: 0.0, // You can get dynamic lat/lon if needed
-        longitude: 0.0,
+        priority: 1, 
+        latitude: 0, 
+        longitude: 0,
       };
   
       try {
@@ -124,10 +124,10 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
         // If the API call is successful, update the UI
         if (response.ok) {
           onAddUser({
-            id: generateUniqueId(), // Replace with unique ID generation logic
+            id: generateUniqueId(), 
             name,
-            company,
-            role,
+            company : relation,
+            role: phone,
             isVerified: false, // Default value, can be updated as needed
             status,
             avatarUrl: ''
@@ -208,23 +208,23 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
         />
         <TextField
           label="Relation"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
+          value={relation}
+          onChange={(e) => setRelation(e.target.value)}
           fullWidth
           variant="outlined"
           required
-          error={errors.company}
-          helperText={errors.company ? 'Relation is required' : ''}
+          error={errors.relation}
+          helperText={errors.relation ? 'Relation is required' : ''}
         />
         <TextField
           label="Phone number"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           fullWidth
           variant="outlined"
           required
-          error={errors.role}
-          helperText={errors.role ? 'Phone No. is required' : ''}
+          error={errors.phone}
+          helperText={errors.phone ? 'Phone No. is required' : ''}
         />
         <TextField
           label="Email"
@@ -264,15 +264,15 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
 
     {/* Snackbar for notifications */}
     <Snackbar
-  open={snackbarOpen}
-  autoHideDuration={3000} // Automatically closes after 6 seconds
-  onClose={handleSnackbarClose} // Called when it auto-closes or user closes it manually
-  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
->
-  <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-    {snackbarMessage}
-  </Alert>
-</Snackbar>
+      open={snackbarOpen}
+      autoHideDuration={3000} // Automatically closes after 6 seconds
+      onClose={handleSnackbarClose} // Called when it auto-closes or user closes it manually
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    >
+      <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        {snackbarMessage}
+      </Alert>
+    </Snackbar>
   </>
   );
 }
