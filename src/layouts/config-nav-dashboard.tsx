@@ -18,6 +18,11 @@ export const navData = [
     path: '/user',
     icon: icon('ic-user'),
   },
+  {
+    title: 'User History',  // New section for User History
+    path: '/user-history',  // Add the corresponding route for the section
+    icon: icon('ic-history'),  // Assuming 'ic-history.svg' exists in your icons folder
+  },
   // {
   //   title: 'Product',
   //   path: '/products',

@@ -13,7 +13,6 @@ import { RouterLink } from 'src/routes/components';
 
 import { varAlpha } from 'src/theme/styles';
 
-import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import { NavUpgrade } from '../components/nav-upgrade';
@@ -119,7 +118,6 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
 
       {slots?.topArea}
 

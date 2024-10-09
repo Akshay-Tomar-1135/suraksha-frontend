@@ -38,7 +38,6 @@ export default function App() {
   return (
     <ThemeProvider>
       <Router />
-      {githubButton}
     </ThemeProvider>
   );
 }

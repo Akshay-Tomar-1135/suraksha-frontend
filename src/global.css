@@ -55,3 +55,6 @@ input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 
+html {
+  scroll-behavior: smooth;
+}
