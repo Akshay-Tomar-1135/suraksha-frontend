@@ -67,7 +67,7 @@ function RenderMap() {
   //     // directions.addWaypoint([-73.8671258, 40.82234996], 0);
   //     // directions.clear();
   //   });
-  
+
   // }, [mapReady]);
 
 

@@ -17,7 +17,7 @@ export default function LandingPage() {
       <Testimonials/>
       <FAQSection />
       <FeedbackForm />
-      <Footer />
+      <Footer/>
     </>
   );
 }

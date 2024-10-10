@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`User History  ${CONFIG.appName}`}</title>
+        <title> {`User History - ${CONFIG.appName}`}</title>
       </Helmet>
 
       <UserHistory />

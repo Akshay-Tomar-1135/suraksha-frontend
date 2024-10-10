@@ -47,19 +47,19 @@ const Header = () => {
         <nav className="md:hidden absolute top-full left-0 w-full bg-gradient-to-r from-[#E0E7FD] to-[#FDFEFF] shadow-md">
           <ul className="flex flex-col gap-4 p-6">
             <li>
-              <a href="#about">About</a>
+              <a href="#">About</a>
             </li>
             <li>
-              <a href="#features">Features</a>
+              <a href="#">Features</a>
             </li>
             <li>
-              <a href="#customers">Customers</a>
+              <a href="#">Customers</a>
             </li>
             <li>
-              <a href="#faq">FAQ</a>
+              <a href="#">Feedback</a>
             </li>
             <li>
-              <a href="#feedback">Feedback</a>
+              <a href="#">Help</a>
             </li>
             <Button text="Get Started" onButtonClick={() => router.push('/auth')} />
           </ul>

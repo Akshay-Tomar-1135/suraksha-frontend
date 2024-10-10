@@ -15,6 +15,7 @@ import { AnalyticsCurrentSubject } from '../analytics-current-subject';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 
 
+
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
@@ -26,6 +27,8 @@ export function OverviewAnalyticsView() {
 
 
       <RenderMap/>
+      {/* <RenderMap2/> */}
+{/* <RenderMap3/> */}
 
       {/* <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>

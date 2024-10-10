@@ -1,85 +1,140 @@
-import { useState, useCallback, useEffect, lazy } from 'react';
+import { useState, useCallback } from 'react';
+
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
+import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import LoadingButton from '@mui/lab/LoadingButton';
+import InputAdornment from '@mui/material/InputAdornment';
+
 import { useRouter } from 'src/routes/hooks';
+
 import { Iconify } from 'src/components/iconify';
 import Button from 'src/components/Button';
-import { userTypeKey, UserTypes } from 'src/_mock/enums';
-import { useAppDispatch, useAppSelector } from 'src/store/reduxHooks';
-import { setUserType } from 'src/store/features/userConfig/userConfigSlice';
-import OTPVerification from './OTPVerification';
-// import WomanSignUpForm from './womanSignUpForm';
-import SignInForm from './signInForm';
-import PoliceSignUpForm from './policeSignUpForm';
-
-const WomanSignUpForm = lazy(()=> import('./womanSignUpForm'));
 
 // ----------------------------------------------------------------------
 
 export function AuthView() {
   const router = useRouter();
-  const { userType } = useAppSelector((state) => state.user);
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(true);
-  const [sendOTPLoading, setSendOTPLoading] = useState<boolean>(false);
+  const [isVerifyOTP, setIsVerifyOTP] = useState<boolean>(true);
 
-  const [OTPVerifyLoading, setOTPVerifyLoading] = useState<boolean>(false);
-  const [OTPVerifying, setOTPVerifying] = useState<boolean>(false);
-  const dispatch = useAppDispatch();
+  const handleSignIn = useCallback(() => {
+    router.push('/dashboard');
+  }, [router]);
 
-  useEffect(() => {
-    const user = localStorage.getItem(userTypeKey);
-    if (!user && !userType) return;
-    if (!userType) dispatch(setUserType(user as UserTypes));
-  }, [userType, dispatch]);
+  const signInForm = (
+    <TextField
+    fullWidth
+    name="phone"
+    type="tel"
+    label="Phone Number"
+    defaultValue=""
+    inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+    InputLabelProps={{ shrink: true }}
+    sx={{ mb: 3 }}
+  />
+  );
 
-  const handleSendOTP = () => {
-    setSendOTPLoading(true);
-    setTimeout(() => {
-      setOTPVerifying(true);
-      setSendOTPLoading(false);
-    }, 2000);
-  };
+  const OTPVerify = (
+      <TextField
+        fullWidth
+        name="password"
+        label="Password"
+        defaultValue="@demo1234"
+        InputLabelProps={{ shrink: true }}
+        type={showPassword ? 'text' : 'password'}
+        // InputProps={{
+        //   endAdornment: (
+        //     <InputAdornment position="end">
+        //       <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+        //         <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+        //       </IconButton>
+        //     </InputAdornment>
+        //   ),
+        // }}
+        sx={{ mb: 3 }}
+      />
+  );
 
-  const handleOTPVerification = useCallback(
-    (otp: string) => {
-      setOTPVerifyLoading(true);
-      setTimeout(() => {
-        setOTPVerifyLoading(false);
-        router.push('/dashboard');
-      }, 2000);
-    },
-    [router]
+  const signUpForm = (<>
+      <TextField
+        fullWidth
+        name="email"
+        label="Email address"
+        defaultValue="hello@gmail.com"
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+      />
+
+<TextField
+        fullWidth
+        name="fname"
+        label="First Name"
+        defaultValue=""
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+      />
+
+<TextField
+        fullWidth
+        name="lname"
+        label="Last Name"
+        defaultValue=""
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+      />
+
+<TextField
+        fullWidth
+        name="aadhaar"
+        label="Aadhaar Card Number"
+        defaultValue=""
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+      />
+
+<TextField
+        fullWidth
+        name="phone"
+        type="tel"
+        label="Phone Number"
+        defaultValue=""
+        inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+      />
+    </>
   );
 
   return (
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">{isSignIn ? 'Sign In' : 'Sign Up'}</Typography>
+        <Typography variant="h5">{isSignIn?"Sign In":"Sign Up"}</Typography>
         <Typography variant="body2" color="text.secondary">
-          {OTPVerifying?'Edit your details':`${isSignIn ? 'Don’t h' : 'H'}ave an account?`}
-          <Button
-            text={OTPVerifying?'Here':(isSignIn ? 'Get Started' : 'Sign In')}
-            className="text-[#1877F2] font-semibold ml-1 hover:underline"
-            onButtonClick={() => OTPVerifying?setOTPVerifying(false):setIsSignIn(!isSignIn)}
-          />
+          {`${isSignIn?"Don’t h":"H"}ave an account?`}
+          <Button text={isSignIn?"Get Started":"Sign In"} className="text-[#1877F2] font-semibold ml-1 hover:underline" onButtonClick={() => setIsSignIn(!isSignIn)} />
         </Typography>
       </Box>
       <Box display="flex" flexDirection="column" alignItems="flex-end">
-        {OTPVerifying ? (
-          <OTPVerification isLoading={OTPVerifyLoading} verifyOTP={handleOTPVerification} />
-        ) : (
-          <>
-            {isSignIn ? (
-              <SignInForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
-            ) : userType === UserTypes.police ? (
-              <PoliceSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
-            ) : (
-              <WomanSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
-            )}
-          </>
-        )}
+      {
+        isSignIn?(signInForm):(signUpForm)
+      }
+      
+      <LoadingButton
+        fullWidth
+        size="large"
+        type="submit"
+        color="inherit"
+        variant="contained"
+        onClick={handleSignIn}
+      >
+        Verify OTP
+      </LoadingButton>
       </Box>
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
         <Typography
