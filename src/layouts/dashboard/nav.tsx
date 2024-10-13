@@ -13,8 +13,8 @@ import { RouterLink } from 'src/routes/components';
 
 import { varAlpha } from 'src/theme/styles';
 
-import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
+import  Logo  from '../../../public/assets/images/main-logo.png';
 
 import { NavUpgrade } from '../components/nav-upgrade';
 import { WorkspacesPopover } from '../components/workspaces-popover';
@@ -119,7 +119,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
+      <img src={Logo} alt="Logo" style={{height:"50px",width:"50px"}} />
 
       {slots?.topArea}
 

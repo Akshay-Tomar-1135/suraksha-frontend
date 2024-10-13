@@ -36,7 +36,6 @@ export default function App() {
     <Provider store={store}>
       <ThemeProvider>
         <Router />
-        {githubButton}
       </ThemeProvider>
     </Provider>
   );
