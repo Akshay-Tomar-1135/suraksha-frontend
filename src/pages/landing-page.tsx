@@ -5,6 +5,7 @@ import Hero from 'src/components/Hero';
 import ProductShowcase from 'src/components/ProductShowcase';
 import Testimonials from 'src/components/Testimonials';
 import FeedbackForm from 'src/components/Feedback';
+import FAQSection from 'src/components/FAQ';
 
 export default function LandingPage() {
   return (
@@ -14,6 +15,7 @@ export default function LandingPage() {
       <BrandSlide />
       <ProductShowcase />
       <Testimonials />
+      <FAQSection />
       <FeedbackForm />
       <Footer />
     </>

@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 
 import { RouterLink } from 'src/routes/components';
 
-import { Logo } from 'src/components/logo';
+import  Logo  from '../../../public/assets/images/main-logo.png';
 
 import { Main, CompactContent } from './main';
 import { LayoutSection } from '../core/layout-section';
@@ -43,7 +43,11 @@ export function SimpleLayout({ sx, children, header, content }: SimpleLayoutProp
                 This is an info Alert.
               </Alert>
             ),
-            leftArea: <Logo />,
+            leftArea: (<img
+              src={Logo}
+              alt="Logo"
+              style={{ height: '50px',width:"50px"}}
+            />),
             rightArea: (
               <Link
                 href="#"
