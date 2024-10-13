@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
+import {Snackbar, Alert} from '@mui/material';
+
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -24,6 +26,9 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
+import { UserAddModal } from '../user-add-modal';
+import { UserEditModal } from '../user-edit-modal';
+import { ConfirmDeleteDialog } from '../confirm-delete-dialog';
 // ----------------------------------------------------------------------
 
 export function UserView() {
@@ -31,8 +36,134 @@ export function UserView() {
 
   const [filterName, setFilterName] = useState('');
 
+  const [users, setUsers] = useState<UserProps[]>(_users); // State to store users
+  const [isAddModalOpen, setAddModalOpen] = useState(false); // State to control modal
+  
+  const [isEditModalOpen, setEditModalOpen] = useState(false); // State to control Edit Modal
+  const [currentUser, setCurrentUser] = useState<UserProps | null>(null); // Store current user to edit
+
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete dialog
+  const [userToDelete, setUserToDelete] = useState<UserProps | null>(null); // Track the user to delete
+
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+
+  // Snackbar handlers
+  const openSnackbar = (message: string, severity: 'success' | 'error') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+
+  const handleOpenAddModal = () => {
+    console.log('Opening Modal');
+    setAddModalOpen(true);
+  };
+  const handleCloseAddModal = () => setAddModalOpen(false);
+
+  const handleAddUser = (newUser: UserProps) => {
+    setUsers((prevUsers) => [...prevUsers, newUser]);
+  };
+
+  const handleOpenEditModal = (user: UserProps) => {
+    setCurrentUser(user); // Set the user to be edited
+    setEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => setEditModalOpen(false);
+
+  const handleEditUser = (updatedUser: UserProps) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === updatedUser.id ? updatedUser : user
+      )
+    );
+  };
+
+  // const handleDeleteUser = (userId: string) => {
+  //   setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+  // };
+
+  async function deleteUserContact(phoneNumber: string) {
+    try {
+      const response = await fetch(`http://localhost:8000/delete_user_contact`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone_number: phoneNumber }), 
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        return { success: true, message: data.message };
+      } 
+      
+      return { success: false, message: data.message };
+      
+    } catch (error) {
+      console.error('Error deleting user contact:', error);
+      return { success: false, message: 'An error occurred while deleting the user contact.' };
+    }
+  }
+
+  // const handleDeleteUser = () => {
+  //   if (userToDelete) {
+  //     setUsers((prevUsers) =>
+  //       prevUsers.filter((user) => user.id !== userToDelete.id)
+  //     );
+      
+  //     setDeleteDialogOpen(false); // Close the dialog after deleting
+  //   }
+  // };
+
+  const handleDeleteUser = async () => {
+    if (userToDelete) {
+      try {
+        const result = await deleteUserContact(userToDelete.role);
+  
+        if (result.success) {
+          setUsers((prevUsers) =>
+            prevUsers.filter((user) => user.id !== userToDelete.id)
+          );
+  
+          // Show success snackbar
+          openSnackbar('User deleted successfully', 'success');
+        } else {
+          // Show error snackbar
+          openSnackbar(`Failed to delete user: ${result.message}`, 'error');
+
+        }
+      } catch (error) {
+        console.error('Error deleting user contact:', error);
+        openSnackbar('An error occurred while deleting the user.', 'error');
+      } finally {
+        setDeleteDialogOpen(false);
+      }
+    }
+  };
+
+  // Open delete confirmation dialog
+  const handleOpenDeleteDialog = (user: UserProps) => {
+    setUserToDelete(user); // Store the user to delete
+    setDeleteDialogOpen(true); // Open the dialog
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false); // Close the dialog without deleting
+    setUserToDelete(null); // Reset the user to delete
+  };
+
   const dataFiltered: UserProps[] = applyFilter({
-    inputData: _users,
+    // inputData: _users,
+    inputData: users, 
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -49,6 +180,7 @@ export function UserView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={handleOpenAddModal}
         >
           New user
         </Button>
@@ -70,20 +202,20 @@ export function UserView() {
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={_users.length}
+                rowCount={users.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    _users.map((user) => user.id)
+                    users.map((user) => user.id)
                   )
                 }
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
+                  { id: 'company', label: 'Relation' },
+                  { id: 'role', label: 'Phone Number' },
+                  { id: 'isVerified', label: 'Email', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: '' },
                 ]}
@@ -100,12 +232,14 @@ export function UserView() {
                       row={row}
                       selected={table.selected.includes(row.id)}
                       onSelectRow={() => table.onSelectRow(row.id)}
+                      onEditRow={() => handleOpenEditModal(row)} // Open the edit modal
+                      onDeleteRow={() => handleOpenDeleteDialog(row)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, users.length)}
                 />
 
                 {notFound && <TableNoData searchQuery={filterName} />}
@@ -117,13 +251,50 @@ export function UserView() {
         <TablePagination
           component="div"
           page={table.page}
-          count={_users.length}
+          count={users.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+
+      {/* Add Modal */}
+      <UserAddModal
+        open={isAddModalOpen}
+        onClose={handleCloseAddModal}
+        onAddUser={handleAddUser}
+      />
+
+      {currentUser && (
+        <UserEditModal
+          open={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          user={currentUser}
+          onEditUser={handleEditUser}
+        />
+      )}
+
+      {/* Confirmation dialog for delete */}
+      {userToDelete && (
+        <ConfirmDeleteDialog
+          open={isDeleteDialogOpen}
+          onClose={handleCloseDeleteDialog}
+          onConfirm={handleDeleteUser} // Confirm deletion
+          userName={userToDelete.name} // Optionally pass the user's name
+        />
+      )}
+
+      {/* Add Snackbar for feedback */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </DashboardContent>
   );
 }
