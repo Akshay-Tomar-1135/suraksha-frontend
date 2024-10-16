@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import  LiveLocation from 'src/components/web_sockets/LiveLocationWebSocket';
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { path: 'dashboard', element: <HomePage />, index: true },
+        { path: 'dashboard', element: <> <HomePage /> <LiveLocation userId = {"1"} /></>, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
