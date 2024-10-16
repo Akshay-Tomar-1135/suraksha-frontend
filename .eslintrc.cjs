@@ -59,6 +59,7 @@ module.exports = {
     'jsx-a11y/label-has-associated-control': 0,
     // unused imports
     'import/no-absolute-path': 0,
+    'consistent-return': 1,
     'unused-imports/no-unused-imports': 1,
     'unused-imports/no-unused-vars': [
       0,

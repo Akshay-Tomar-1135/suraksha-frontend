@@ -45,7 +45,7 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { path: 'dashboard', element: <> <HomePage /> <LiveLocation userId = {"1"} /></>, index: true },
+        { path: 'dashboard', element: <> <HomePage /> <LiveLocation userId = "1" /></>, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
