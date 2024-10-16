@@ -1,7 +1,7 @@
 // LiveLocation.js
 import React, { useEffect, useState } from 'react';
 
-const LiveLocation = (userId) => {
+const LiveLocation = ({ userId }) => {
   const [socket, setSocket] = useState(null);
   const [otherUsers, setOtherUsers] = useState([]);
 
@@ -61,7 +61,7 @@ const LiveLocation = (userId) => {
 
   return (
     <div>
-      <h3>Other Users&aops;s Live Locations</h3>
+      <h3>Other User&#39;s Live Locations</h3>
       <ul>
         {otherUsers.map((user) => (
           <li key={user.user_id}>
