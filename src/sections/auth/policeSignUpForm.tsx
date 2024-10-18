@@ -2,6 +2,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { minimumUserFirstNameLength } from 'src/_mock';
+import { PoliceInfo } from 'src/interface/UserConfig';
 import PhoneInput from './phoneInput';
 
 interface FormValues {
@@ -54,9 +55,9 @@ const validateForm = (values: FormValues) => {
 
 interface PoliceSignUpFormProps {
   isLoading: boolean;
-  handleSubmit: () => void;
+  handleSubmit: (query: PoliceInfo) => void;
 }
-// React Component Example
+
 const PoliceSignUpForm = ({ isLoading, handleSubmit }: PoliceSignUpFormProps) => {
   const [formValues, setFormValues] = useState<FormValues>({
     email: '',
@@ -90,7 +91,14 @@ const PoliceSignUpForm = ({ isLoading, handleSubmit }: PoliceSignUpFormProps) =>
 
     // Check if there are no errors, then submit form
     if (Object.values(errors).length === 0) {
-      handleSubmit();
+      handleSubmit({
+        fname: formValues.fname,
+        lname: formValues.lname,
+        police_id: formValues.policeId,
+        police_station_address: formValues.policeStationAddress,
+        phone_number: formValues.countryCode+formValues.phoneNumber,
+        email: formValues.email
+      });
     }
   };
 

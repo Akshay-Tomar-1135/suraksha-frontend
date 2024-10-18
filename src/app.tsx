@@ -5,6 +5,8 @@ import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 import { ThemeProvider } from 'src/theme/theme-provider';
 import { Iconify } from 'src/components/iconify';
 import { Provider } from 'react-redux';
+import { SnackbarProvider } from 'notistack';
+import { ToastProvider } from './components/snackBar/ToastContext';
 import store from './store/store';
 
 // ----------------------------------------------------------------------
@@ -35,8 +37,12 @@ export default function App() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <Router />
-        {githubButton}
+        <SnackbarProvider maxSnack={3}>
+          <ToastProvider>
+            <Router />
+            {githubButton}
+          </ToastProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </Provider>
   );
