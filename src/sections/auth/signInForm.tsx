@@ -26,7 +26,7 @@ const validateForm = (values: FormValues) => {
 
 interface SignInFormProps {
   isLoading: boolean;
-  handleSubmit: () => void;
+  handleSubmit: (phone_number: string) => void;
 }
 // React Component Example
 const SignInForm = ({ isLoading, handleSubmit }: SignInFormProps) => {
@@ -53,7 +53,7 @@ const SignInForm = ({ isLoading, handleSubmit }: SignInFormProps) => {
 
     // Check if there are no errors, then submit form
     if (Object.values(errors).length === 0) {
-      handleSubmit();
+      handleSubmit(formValues.countryCode+formValues.phoneNumber);
     }
   };
 
