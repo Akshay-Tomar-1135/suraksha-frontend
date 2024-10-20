@@ -6,24 +6,29 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
 import Button from 'src/components/Button';
-import { userTypeKey, UserTypes } from 'src/_mock/enums';
+import { Severity, userTypeKey, UserTypes } from 'src/_mock';
 import { useAppDispatch, useAppSelector } from 'src/store/reduxHooks';
-import { setUserType } from 'src/store/features/userConfig/userConfigSlice';
-import OTPVerification from './OTPVerification';
-// import WomanSignUpForm from './womanSignUpForm';
-import SignInForm from './signInForm';
-import PoliceSignUpForm from './policeSignUpForm';
+import { fetchUser, setUserType } from 'src/store/features/userConfig/userConfigSlice';
+import { userService } from 'src/service/userService';
+import { AuthResponse, PoliceInfo, WomanInfo } from 'src/interface/UserConfig';
+import { useToast } from 'src/components/snackBar/ToastContext';
 
-const WomanSignUpForm = lazy(()=> import('./womanSignUpForm'));
+const WomanSignUpForm = lazy(() => import('./womanSignUpForm'));
+const SignInForm = lazy(() => import('./signInForm'));
+const OTPVerification = lazy(() => import('./OTPVerification'));
+const PoliceSignUpForm = lazy(() => import('./policeSignUpForm'));
 
 // ----------------------------------------------------------------------
 
 export function AuthView() {
   const router = useRouter();
-  const { userType } = useAppSelector((state) => state.user);
+  const { userType, userInfo, isUserFetchError, isfetchingUser } = useAppSelector(
+    (state) => state.user
+  );
   const [isSignIn, setIsSignIn] = useState<boolean>(true);
   const [sendOTPLoading, setSendOTPLoading] = useState<boolean>(false);
-
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const { showToast } = useToast();
   const [OTPVerifyLoading, setOTPVerifyLoading] = useState<boolean>(false);
   const [OTPVerifying, setOTPVerifying] = useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -34,23 +39,79 @@ export function AuthView() {
     if (!userType) dispatch(setUserType(user as UserTypes));
   }, [userType, dispatch]);
 
-  const handleSendOTP = () => {
-    setSendOTPLoading(true);
-    setTimeout(() => {
-      setOTPVerifying(true);
-      setSendOTPLoading(false);
-    }, 2000);
-  };
+  useEffect(() => {
+    if (!userInfo || isUserFetchError || isfetchingUser || !userType) return;
+    router.push('/dashboard');
+  }, [router, userInfo, isUserFetchError, isfetchingUser, userType]);
+
+  const handleSignUpSendOTP = useCallback(
+    async (payload: WomanInfo | PoliceInfo) => {
+      try {
+        setSendOTPLoading(true);
+        setPhoneNumber(payload.phone_number);
+        let response: AuthResponse;
+        if (userType === UserTypes.woman)
+          response = await userService.womanSignup(payload as WomanInfo);
+        else if (userType === UserTypes.police)
+          response = await userService.policeSignup(payload as PoliceInfo);
+        else throw new Error('Error: Invalid user type');
+        setOTPVerifying(true);
+        showToast(response.message);
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
+        setSendOTPLoading(false);
+      }
+    },
+    [showToast, userType]
+  );
+
+  const handleSignInSendOTP = useCallback(
+    async (phone_number: string) => {
+      if (!userType) return;
+      try {
+        setSendOTPLoading(true);
+        setPhoneNumber(phone_number);
+        const response: AuthResponse = await userService.signIn({ userType, phone_number });
+        setOTPVerifying(true);
+        showToast(response.message);
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
+        setSendOTPLoading(false);
+      }
+    },
+    [showToast, userType]
+  );
 
   const handleOTPVerification = useCallback(
-    (otp: string) => {
-      setOTPVerifyLoading(true);
-      setTimeout(() => {
+    async (otp: string) => {
+      if (!userType || !phoneNumber) return;
+      try {
+        setOTPVerifyLoading(true);
+        const response: AuthResponse = await userService.OTPVerification({
+          isLogin: isSignIn,
+          userType,
+          phone_number: phoneNumber,
+          otp,
+        });
+        showToast(response.message);
+        dispatch(
+          fetchUser({
+            userType,
+            phone_number: phoneNumber,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
         setOTPVerifyLoading(false);
-        router.push('/dashboard');
-      }, 2000);
+      }
     },
-    [router]
+    [isSignIn, phoneNumber, userType, showToast, dispatch]
   );
 
   return (
@@ -58,11 +119,11 @@ export function AuthView() {
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
         <Typography variant="h5">{isSignIn ? 'Sign In' : 'Sign Up'}</Typography>
         <Typography variant="body2" color="text.secondary">
-          {OTPVerifying?'Edit your details':`${isSignIn ? 'Don’t h' : 'H'}ave an account?`}
+          {OTPVerifying ? 'Edit your details' : `${isSignIn ? 'Don’t h' : 'H'}ave an account?`}
           <Button
-            text={OTPVerifying?'Here':(isSignIn ? 'Get Started' : 'Sign In')}
+            text={OTPVerifying ? 'Here' : isSignIn ? 'Get Started' : 'Sign In'}
             className="text-[#1877F2] font-semibold ml-1 hover:underline"
-            onButtonClick={() => OTPVerifying?setOTPVerifying(false):setIsSignIn(!isSignIn)}
+            onButtonClick={() => (OTPVerifying ? setOTPVerifying(false) : setIsSignIn(!isSignIn))}
           />
         </Typography>
       </Box>
@@ -72,11 +133,11 @@ export function AuthView() {
         ) : (
           <>
             {isSignIn ? (
-              <SignInForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
+              <SignInForm isLoading={sendOTPLoading} handleSubmit={handleSignInSendOTP} />
             ) : userType === UserTypes.police ? (
-              <PoliceSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
+              <PoliceSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSignUpSendOTP} />
             ) : (
-              <WomanSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSendOTP} />
+              <WomanSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSignUpSendOTP} />
             )}
           </>
         )}

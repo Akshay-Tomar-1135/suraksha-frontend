@@ -1,8 +1,22 @@
 export enum UserTypes {
-  woman = 'woman',
+  woman = 'user',
   police = 'police',
 }
 
-export const userTypeKey = 'userType';
+export enum Severity {
+  success = 'success',
+  error = 'error',
+  info = 'info',
+  warning = 'warning',
+}
 
-export const minimumUserFirstNameLength = 3;
+export enum VerticalDirection {
+  top = 'top',
+  bottom = 'bottom',
+}
+
+export enum HorizontalDirection {
+  left = 'left',
+  right = 'right',
+  center = 'center',
+}
