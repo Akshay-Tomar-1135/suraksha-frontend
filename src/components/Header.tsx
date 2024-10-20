@@ -31,6 +31,28 @@ export default function Header() {
     router.push('/auth');
   }, [localUserType, router]);
 
+  const navLinks = [
+    { name: 'About', href: '#about' },
+    { name: 'Features', href: '#features' },
+    { name: 'Customers', href: '#customers' },
+    { name: 'FAQ', href: '#faq' },
+    { name: 'Feedback', href: '#feedback' },
+  ];
+
+  const renderNavLinks = () =>
+    navLinks.map((link) => (
+      <li key={link.name}>
+        <a href={link.href}>{link.name}</a>
+      </li>
+    ));
+
+  const menuList = (
+    <>
+      {renderNavLinks()}
+      <Button text="Get Started" onButtonClick={() => setOpenModal(true)} />
+    </>
+  );
+
   return (
     <>
       <UserTypeModal
@@ -47,47 +69,13 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
-          <ul className="flex gap-6 items-center">
-            <li>
-              <a href="#">About</a>
-            </li>
-            <li>
-              <a href="#">Features</a>
-            </li>
-            <li>
-              <a href="#">Customers</a>
-            </li>
-            <li>
-              <a href="#">Feedback</a>
-            </li>
-            <li>
-              <a href="#">Help</a>
-            </li>
-            <Button text="Get Started" onButtonClick={() => setOpenModal(true)} />
-          </ul>
+          <ul className="flex gap-6 items-center">{menuList}</ul>
         </nav>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="md:hidden absolute top-full left-0 w-full bg-gradient-to-r from-[#E0E7FD] to-[#FDFEFF] shadow-md">
-            <ul className="flex flex-col gap-4 p-6">
-              <li>
-                <a href="#">About</a>
-              </li>
-              <li>
-                <a href="#">Features</a>
-              </li>
-              <li>
-                <a href="#">Customers</a>
-              </li>
-              <li>
-                <a href="#">Feedback</a>
-              </li>
-              <li>
-                <a href="#">Help</a>
-              </li>
-              <Button text="Get Started" onButtonClick={() => router.push('/auth')} />
-            </ul>
+            <ul className="flex flex-col gap-4 p-6">{menuList}</ul>
           </nav>
         )}
       </header>
