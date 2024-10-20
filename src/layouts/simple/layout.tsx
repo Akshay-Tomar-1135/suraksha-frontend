@@ -46,7 +46,7 @@ export function SimpleLayout({ sx, children, header, content }: SimpleLayoutProp
             leftArea: (<img
               src={Logo}
               alt="Logo"
-              style={{ height: '50px',width:"50px"}}
+              className="h-[50px] w-[50px]"
             />),
             rightArea: (
               <Link

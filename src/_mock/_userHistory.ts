@@ -38,32 +38,24 @@ export const _ratings = (index: number) => [
   -5, -1, -3, -4, -2, -1, -3, -5, -2, -4, -3, -1, -2, -5,
 ][index];
 
-export const _travelMode = (index: number) => [
-  'foot',
-  'cab',
-  'bus',
-  'foot',
-  'cab',
-  'bus',
-  'foot',
-  'cab',
-  'bus',
-  'foot',
-  'cab',
-  'bus',
-  'foot',
-  'cab',
-][index];
+export const _distance = (index: number) => {
+  const distances = ['10 km', '15 km', '20 km', '25 km', '30 km'];
+  return distances[index % distances.length];
+};
 
+export const _timeTaken = (index: number) => {
+  const times = ['1 hr', '2 hrs', '3 hrs', '4 hrs', '5 hrs'];
+  return times[index % times.length];
+};
 
 export interface History {
   id: string;
   source: string;
   destination: string;
   rating: number;
-  travelMode: string;
+  distance: string;  // New field
+  timeTaken: string; // New field
 }
-
 
 export const mockData = (length: number): History[] => {
   const data: History[] = [];
@@ -76,11 +68,11 @@ export const mockData = (length: number): History[] => {
       source: _source(index) || '',
       destination: _destination(index) || '',
       rating: _ratings(index),
-      travelMode: _travelMode(index), 
+      distance: _distance(i),    // Added distance
+      timeTaken: _timeTaken(i),  // Added time taken
     });
   }
   return data;
 };
-
 
 export const getAllMockData = (): History[] => mockData(100);

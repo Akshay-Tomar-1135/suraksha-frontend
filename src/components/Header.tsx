@@ -13,10 +13,10 @@ export default function Header() {
   const [localUserType, setLocalUserType] = useState<UserTypes | null>(null);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track menu visibility
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); 
+    setIsMenuOpen(!isMenuOpen); // Toggle menu visibility
   };
 
   const dispatch = useAppDispatch();
@@ -46,6 +46,13 @@ export default function Header() {
       </li>
     ));
 
+  const menuList = (
+    <>
+      {renderNavLinks()}
+      <Button text="Get Started" onButtonClick={() => setOpenModal(true)} />
+    </>
+  );
+
   return (
     <>
       <UserTypeModal
@@ -62,19 +69,13 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
-          <ul className="flex gap-6 items-center">
-            {renderNavLinks()}
-            <Button text="Get Started" onButtonClick={() => setOpenModal(true)} />
-          </ul>
+          <ul className="flex gap-6 items-center">{menuList}</ul>
         </nav>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="md:hidden absolute top-full left-0 w-full bg-gradient-to-r from-[#E0E7FD] to-[#FDFEFF] shadow-md">
-            <ul className="flex flex-col gap-4 p-6">
-              {renderNavLinks()}
-              <Button text="Get Started" onButtonClick={() => router.push('/auth')} />
-            </ul>
+            <ul className="flex flex-col gap-4 p-6">{menuList}</ul>
           </nav>
         )}
       </header>

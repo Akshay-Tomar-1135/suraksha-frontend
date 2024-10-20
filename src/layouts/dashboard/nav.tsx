@@ -119,7 +119,8 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      <img src={Logo} alt="Logo" style={{height:"50px",width:"50px"}} />
+      <img src={Logo} alt="Logo" className="h-12 w-12" />
+
 
       {slots?.topArea}
 
