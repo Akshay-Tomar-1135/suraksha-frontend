@@ -7,7 +7,7 @@ import { RouterLink } from 'src/routes/components';
 
 import { stylesMode } from 'src/theme/styles';
 
-import  Logo  from '../../../public/assets/images/main-logo.png';
+import Logo from '../../../public/assets/images/main-logo.png';
 
 import { Main } from './main';
 import { HeaderSection } from '../core/header-section';
@@ -49,11 +49,7 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
                 This is an info Alert.
               </Alert>
             ),
-            leftArea: (<img
-              src={Logo}
-              alt="Logo"
-              style={{ height: '50px',width:"50px"}}
-            />),
+            leftArea: <img src={Logo} alt="Logo" className="h-[50] w-[50]" />,
             rightArea: (
               <Link
                 component={RouterLink}
