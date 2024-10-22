@@ -187,3 +187,22 @@ export const _notifications = [
     isUnRead: false,
   },
 ];
+
+export const faq = [
+  {
+    question: 'What is Suraksha?',
+    answer: 'Suraksha is a platform designed to ensure women’s safety by providing real-time tracking, safest routes, and emergency alerts.',
+  },
+  {
+    question: 'How does live location tracking work?',
+    answer: 'Live location tracking uses GPS to share your real-time position with your emergency contacts, allowing them to monitor your safety.',
+  },
+  {
+    question: 'Can I mark unsafe areas?',
+    answer: 'Yes, users can report and mark areas as safe or unsafe, which helps others plan safer routes.',
+  },
+  {
+    question: 'How can I contribute to Suraksha?',
+    answer: 'You can contribute by providing feedback, sharing your experience, and donating through the platform to support further development.',
+  },
+];
