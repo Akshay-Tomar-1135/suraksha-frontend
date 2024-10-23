@@ -35,6 +35,8 @@ module.exports = {
     'no-underscore-dangle': 0,
     'no-restricted-exports': 0,
     'no-promise-executor-return': 0,
+    'no-else-return': 1,
+    'consistent-return': 1,
     'import/prefer-default-export': 0,
     'prefer-destructuring': [1, { object: true, array: false }],
     // typescript
@@ -50,6 +52,8 @@ module.exports = {
     'react/require-default-props': 0,
     'react/jsx-props-no-spreading': 0,
     'react/function-component-definition': 0,
+    'react/jsx-curly-brace-presence': 1,
+    'react/no-unused-prop-types': 1,
     'react/jsx-no-duplicate-props': [1, { ignoreCase: false }],
     'react/jsx-no-useless-fragment': [1, { allowExpressions: true }],
     'react/no-unstable-nested-components': [1, { allowAsProps: true }],

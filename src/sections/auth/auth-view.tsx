@@ -1,140 +1,146 @@
-import { useState, useCallback } from 'react';
-
+import { useState, useCallback, useEffect, lazy } from 'react';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
-import InputAdornment from '@mui/material/InputAdornment';
-
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
 import Button from 'src/components/Button';
+import { Severity, userTypeKey, UserTypes } from 'src/_mock';
+import { useAppDispatch, useAppSelector } from 'src/store/reduxHooks';
+import { fetchUser, setUserType } from 'src/store/features/userConfig/userConfigSlice';
+import { userService } from 'src/service/userService';
+import { AuthResponse, PoliceInfo, WomanInfo } from 'src/interface/UserConfig';
+import { useToast } from 'src/components/snackBar/ToastContext';
+
+const WomanSignUpForm = lazy(() => import('./womanSignUpForm'));
+const SignInForm = lazy(() => import('./signInForm'));
+const OTPVerification = lazy(() => import('./OTPVerification'));
+const PoliceSignUpForm = lazy(() => import('./policeSignUpForm'));
 
 // ----------------------------------------------------------------------
 
 export function AuthView() {
   const router = useRouter();
-
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { userType, userInfo, isUserFetchError, isfetchingUser } = useAppSelector(
+    (state) => state.user
+  );
   const [isSignIn, setIsSignIn] = useState<boolean>(true);
-  const [isVerifyOTP, setIsVerifyOTP] = useState<boolean>(true);
+  const [sendOTPLoading, setSendOTPLoading] = useState<boolean>(false);
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const { showToast } = useToast();
+  const [OTPVerifyLoading, setOTPVerifyLoading] = useState<boolean>(false);
+  const [OTPVerifying, setOTPVerifying] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
 
-  const handleSignIn = useCallback(() => {
+  useEffect(() => {
+    const user = localStorage.getItem(userTypeKey);
+    if (!user && !userType) return;
+    if (!userType) dispatch(setUserType(user as UserTypes));
+  }, [userType, dispatch]);
+
+  useEffect(() => {
+    if (!userInfo || isUserFetchError || isfetchingUser || !userType) return;
     router.push('/dashboard');
-  }, [router]);
+  }, [router, userInfo, isUserFetchError, isfetchingUser, userType]);
 
-  const signInForm = (
-    <TextField
-    fullWidth
-    name="phone"
-    type="tel"
-    label="Phone Number"
-    defaultValue=""
-    inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
-    InputLabelProps={{ shrink: true }}
-    sx={{ mb: 3 }}
-  />
+  const handleSignUpSendOTP = useCallback(
+    async (payload: WomanInfo | PoliceInfo) => {
+      try {
+        setSendOTPLoading(true);
+        setPhoneNumber(payload.phone_number);
+        let response: AuthResponse;
+        if (userType === UserTypes.woman)
+          response = await userService.womanSignup(payload as WomanInfo);
+        else if (userType === UserTypes.police)
+          response = await userService.policeSignup(payload as PoliceInfo);
+        else throw new Error('Error: Invalid user type');
+        setOTPVerifying(true);
+        showToast(response.message);
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
+        setSendOTPLoading(false);
+      }
+    },
+    [showToast, userType]
   );
 
-  const OTPVerify = (
-      <TextField
-        fullWidth
-        name="password"
-        label="Password"
-        defaultValue="@demo1234"
-        InputLabelProps={{ shrink: true }}
-        type={showPassword ? 'text' : 'password'}
-        // InputProps={{
-        //   endAdornment: (
-        //     <InputAdornment position="end">
-        //       <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-        //         <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-        //       </IconButton>
-        //     </InputAdornment>
-        //   ),
-        // }}
-        sx={{ mb: 3 }}
-      />
+  const handleSignInSendOTP = useCallback(
+    async (phone_number: string) => {
+      if (!userType) return;
+      try {
+        setSendOTPLoading(true);
+        setPhoneNumber(phone_number);
+        const response: AuthResponse = await userService.signIn({ userType, phone_number });
+        setOTPVerifying(true);
+        showToast(response.message);
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
+        setSendOTPLoading(false);
+      }
+    },
+    [showToast, userType]
   );
 
-  const signUpForm = (<>
-      <TextField
-        fullWidth
-        name="email"
-        label="Email address"
-        defaultValue="hello@gmail.com"
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-
-<TextField
-        fullWidth
-        name="fname"
-        label="First Name"
-        defaultValue=""
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-
-<TextField
-        fullWidth
-        name="lname"
-        label="Last Name"
-        defaultValue=""
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-
-<TextField
-        fullWidth
-        name="aadhaar"
-        label="Aadhaar Card Number"
-        defaultValue=""
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-
-<TextField
-        fullWidth
-        name="phone"
-        type="tel"
-        label="Phone Number"
-        defaultValue=""
-        inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-    </>
+  const handleOTPVerification = useCallback(
+    async (otp: string) => {
+      if (!userType || !phoneNumber) return;
+      try {
+        setOTPVerifyLoading(true);
+        const response: AuthResponse = await userService.OTPVerification({
+          isLogin: isSignIn,
+          userType,
+          phone_number: phoneNumber,
+          otp,
+        });
+        showToast(response.message);
+        dispatch(
+          fetchUser({
+            userType,
+            phone_number: phoneNumber,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, { severity: Severity.error });
+      } finally {
+        setOTPVerifyLoading(false);
+      }
+    },
+    [isSignIn, phoneNumber, userType, showToast, dispatch]
   );
 
   return (
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">{isSignIn?"Sign In":"Sign Up"}</Typography>
+        <Typography variant="h5">{isSignIn ? 'Sign In' : 'Sign Up'}</Typography>
         <Typography variant="body2" color="text.secondary">
-          {`${isSignIn?"Don’t h":"H"}ave an account?`}
-          <Button text={isSignIn?"Get Started":"Sign In"} className="text-[#1877F2] font-semibold ml-1 hover:underline" onButtonClick={() => setIsSignIn(!isSignIn)} />
+          {OTPVerifying ? 'Edit your details' : `${isSignIn ? 'Don’t h' : 'H'}ave an account?`}
+          <Button
+            text={OTPVerifying ? 'Here' : isSignIn ? 'Get Started' : 'Sign In'}
+            className="text-[#1877F2] font-semibold ml-1 hover:underline"
+            onButtonClick={() => (OTPVerifying ? setOTPVerifying(false) : setIsSignIn(!isSignIn))}
+          />
         </Typography>
       </Box>
       <Box display="flex" flexDirection="column" alignItems="flex-end">
-      {
-        isSignIn?(signInForm):(signUpForm)
-      }
-      
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        color="inherit"
-        variant="contained"
-        onClick={handleSignIn}
-      >
-        Verify OTP
-      </LoadingButton>
+        {OTPVerifying ? (
+          <OTPVerification isLoading={OTPVerifyLoading} verifyOTP={handleOTPVerification} />
+        ) : (
+          <>
+            {isSignIn ? (
+              <SignInForm isLoading={sendOTPLoading} handleSubmit={handleSignInSendOTP} />
+            ) : userType === UserTypes.police ? (
+              <PoliceSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSignUpSendOTP} />
+            ) : (
+              <WomanSignUpForm isLoading={sendOTPLoading} handleSubmit={handleSignUpSendOTP} />
+            )}
+          </>
+        )}
       </Box>
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
         <Typography

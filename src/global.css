@@ -9,6 +9,10 @@
 @import '@fontsource/barlow/700.css';
 @import '@fontsource/barlow/800.css';
 
+/* // Importing fonts (if using @fontsource or Google Fonts) */
+@import '@fontsource-variable/dm-sans'; 
+@import '@fontsource/barlow'; 
+
 /** **************************************
 * Plugins
 *************************************** */
@@ -53,5 +57,9 @@ input[type='number']::-webkit-outer-spin-button {
 input[type='number']::-webkit-inner-spin-button {
   margin: 0;
   -webkit-appearance: none;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 

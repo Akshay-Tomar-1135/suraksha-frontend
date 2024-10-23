@@ -230,3 +230,7 @@ export const _productNames = (index: number) =>
     'Nike React Art3mis',
     'Nike React Infinity Run Flyknit A.I.R. Chaz Bear',
   ][index];
+
+export const userTypeKey = 'userType';
+
+export const minimumUserFirstNameLength = 3;

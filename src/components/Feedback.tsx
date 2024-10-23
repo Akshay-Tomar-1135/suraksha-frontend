@@ -54,7 +54,7 @@ const FeedbackForm = () => {
   };
 
   return (
-    <section className="py-10 px-6 sm:px-8 md:px-10 bg-gradient-to-t from-[#a0c8f0] to-[#e0f2ff] text-black">
+    <section id='feedback' className="py-10 px-6 sm:px-8 md:px-10 text-black">
       <div className="flex flex-col items-center max-w-4xl mx-auto">
         <div className="text-3xl md:text-4xl lg:text-5xl pt-4 font-bold tracking-tighter mb-4 text-center bg-gradient-to-b from-black to-[#6a0dad] text-transparent bg-clip-text">
           We Value Your Feedback
