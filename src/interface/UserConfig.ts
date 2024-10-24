@@ -8,6 +8,7 @@ export type PhoneNumber =
 export type Email = `${string}@${string}.${string}`;
 
 export interface WomanInfo {
+  user_id: string;
   fname: string;
   lname?: string;
   adhaar_number: string;
@@ -21,6 +22,7 @@ export interface WomanInfo {
 export interface WomanDetailResponse {
   status: string;
   data: {
+    user_id: string;
     name: string;
     adhaar_number: string;
     state: string;
@@ -32,6 +34,7 @@ export interface WomanDetailResponse {
 }
 
 export interface PoliceInfo {
+  user_id: string;
   fname: string;
   lname?: string;
   police_id: string;
@@ -44,6 +47,7 @@ export interface PoliceInfo {
 export interface PoliceDetailResponse {
   status: string;
   data: {
+    user_id: string;
     name: string;
     police_id: string;
     police_station_address: string;
