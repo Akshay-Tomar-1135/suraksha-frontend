@@ -98,7 +98,7 @@ const PoliceSignUpForm = ({ isLoading, handleSubmit }: PoliceSignUpFormProps) =>
         police_station_address: formValues.policeStationAddress,
         phone_number: formValues.countryCode+formValues.phoneNumber,
         email: formValues.email
-      });
+      } as PoliceInfo);
     }
   };
 
