@@ -11,6 +11,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import { useToast } from 'src/components/snackBar/ToastContext';
 
 type UserEditModalProps = {
   open: boolean;
@@ -36,6 +37,9 @@ type UserEditModalProps = {
 };
 
 export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModalProps) {
+  
+  const { showToast } = useToast();
+
   const [name, setName] = useState(user.name);
   const [company, setCompany] = useState(user.company);
   const [role, setRole] = useState(user.role);
@@ -47,11 +51,6 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
     role: false,
     status: false,
   });
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar visibility state
-  const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success'); // Snackbar severity
-
 
   useEffect(() => {
     setName(user.name);
@@ -98,29 +97,17 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
         });
 
         if (result.success) {
-          // Show success message
-          setSnackbarMessage('User updated successfully!');
-          setSnackbarSeverity('success');
+          showToast('User updated successfully', {severity: 'success'});
           onEditUser({ id: user.id, name, company, role, isVerified: user.isVerified, status });
           handleClose();
         } else {
-          // Show error message
-          setSnackbarMessage(result.message || 'Failed to update user');
-          setSnackbarSeverity('error');
+          showToast(`Error: ${result.message}`, { severity: 'error' });
         }
       } catch (error) {
-        // Handle unexpected errors
         console.error('Error updating user contact:', error);
-        setSnackbarMessage('An error occurred while updating the user');
-        setSnackbarSeverity('error');
-      } finally {
-        setSnackbarOpen(true); // Show snackbar
-      }
+        showToast('An error occurred while updating the user.', { severity: 'error' });
+      } 
     }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
   };
 
   return (
@@ -203,16 +190,6 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
       </DialogActions>
     </Dialog>
 
-    {/* Snackbar for success or error feedback */}
-    <Snackbar
-    open={snackbarOpen}
-    autoHideDuration={3000}
-    onClose={handleSnackbarClose}
-    >
-    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
-      {snackbarMessage}
-    </Alert>
-  </Snackbar>
   </>
   );
 }

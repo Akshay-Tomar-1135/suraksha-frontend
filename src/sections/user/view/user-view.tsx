@@ -8,8 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import {Snackbar, Alert} from '@mui/material';
+import { useToast } from 'src/components/snackBar/ToastContext'; 
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -45,22 +44,7 @@ export function UserView() {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete dialog
   const [userToDelete, setUserToDelete] = useState<UserProps | null>(null); // Track the user to delete
 
-  // Snackbar states
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-
-  // Snackbar handlers
-  const openSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
+  const { showToast } = useToast();
 
   const handleOpenAddModal = () => {
     console.log('Opening Modal');
@@ -114,16 +98,6 @@ export function UserView() {
     }
   }
 
-  // const handleDeleteUser = () => {
-  //   if (userToDelete) {
-  //     setUsers((prevUsers) =>
-  //       prevUsers.filter((user) => user.id !== userToDelete.id)
-  //     );
-      
-  //     setDeleteDialogOpen(false); // Close the dialog after deleting
-  //   }
-  // };
-
   const handleDeleteUser = async () => {
     if (userToDelete) {
       try {
@@ -135,15 +109,15 @@ export function UserView() {
           );
   
           // Show success snackbar
-          openSnackbar('User deleted successfully', 'success');
+          showToast('User deleted successfully', {severity: 'success'});
         } else {
           // Show error snackbar
-          openSnackbar(`Failed to delete user: ${result.message}`, 'error');
+          showToast(`Failed to delete user: ${result.message}`, { severity: 'error' });
 
         }
       } catch (error) {
         console.error('Error deleting user contact:', error);
-        openSnackbar('An error occurred while deleting the user.', 'error');
+        showToast('An error occurred while deleting the user.', { severity: 'error' });
       } finally {
         setDeleteDialogOpen(false);
       }
@@ -285,16 +259,6 @@ export function UserView() {
         />
       )}
 
-      {/* Add Snackbar for feedback */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </DashboardContent>
   );
 }

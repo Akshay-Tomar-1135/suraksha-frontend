@@ -2,6 +2,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { minimumUserFirstNameLength } from 'src/_mock';
+import { WomanInfo } from 'src/interface/UserConfig';
 import PhoneInput from './phoneInput';
 
 interface FormValues {
@@ -49,7 +50,7 @@ const validateForm = (values: FormValues) => {
 
 interface WomanSignUpFormProps {
   isLoading: boolean;
-  handleSubmit: () => void;
+  handleSubmit: (query: WomanInfo) => void;
 }
 // React Component Example
 const WomanSignUpForm = ({ isLoading, handleSubmit }: WomanSignUpFormProps) => {
@@ -93,7 +94,13 @@ const WomanSignUpForm = ({ isLoading, handleSubmit }: WomanSignUpFormProps) => {
 
     // Check if there are no errors, then submit form
     if (Object.values(errors).length === 0) {
-      handleSubmit();
+      handleSubmit({
+        fname: formValues.fname,
+        lname: formValues.lname,
+        adhaar_number: formValues.aadhaar,
+        phone_number: formValues.countryCode + formValues.phoneNumber,
+        email: formValues.email,
+      } as WomanInfo);
     }
   };
 

@@ -11,6 +11,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
+import { useToast } from 'src/components/snackBar/ToastContext'; 
 import { _company } from 'src/_mock';
 
 type UserAddModalProps = {
@@ -46,6 +47,9 @@ async function addUserContact(contact: any): Promise<Response> { // Return the r
 
 
 export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
+
+  const { showToast } = useToast();
+
   const [name, setName] = useState('');
   const [relation, setRelation] = useState('');
   const [phone, setPhone] = useState('');
@@ -59,11 +63,6 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
     status: false,
     email: false
   });
-
-  // Snackbar state
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const handleClose = () => {
     setName('');
@@ -79,11 +78,6 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       email: false,
     });
     onClose();
-  };
-
-   // Close Snackbar
-   const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
   };
 
   // Validation logic
@@ -118,10 +112,8 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       };
   
       try {
-        // Call the API to add the user contact
         const response = await addUserContact(newUserContact);
   
-        // If the API call is successful, update the UI
         if (response.ok) {
           onAddUser({
             id: generateUniqueId(), 
@@ -133,23 +125,17 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
             avatarUrl: ''
           });
   
-          // Show success message
-          setSnackbarSeverity('success');
-          setSnackbarMessage('User added successfully');
+          showToast('User added successfully', {severity: 'success'});
         } else {
           const data = await response.json();
-          // Show error message
-          setSnackbarSeverity('error');
-          setSnackbarMessage(`Error: ${data.message}`);
+          showToast(`Error: ${data.message}`, { severity: 'error' });
         }
       } catch (error) {
         console.error('Error adding user contact:', error);
-        setSnackbarSeverity('error');
-        setSnackbarMessage('An error occurred while adding the user contact.');
+        showToast('An error occurred while adding the user contact.', { severity: 'error' });
       } finally {
         // Close the form regardless of success or failure
         handleClose();
-        setSnackbarOpen(true);
       }
     }
   };
@@ -261,18 +247,6 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={3000} // Automatically closes after 6 seconds
-      onClose={handleSnackbarClose} // Called when it auto-closes or user closes it manually
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-    >
-      <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-        {snackbarMessage}
-      </Alert>
-    </Snackbar>
   </>
   );
 }
