@@ -20,3 +20,11 @@ export enum HorizontalDirection {
   right = 'right',
   center = 'center',
 }
+
+export enum Mood {
+  worse = 'worse',
+  bad = 'bad',
+  fine = 'fine',
+  good = 'good',
+  great = 'great',
+}

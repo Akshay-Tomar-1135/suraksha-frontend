@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion'; // , useScroll, useTransform } 
 import { FaArrowRight } from 'react-icons/fa';
 import Button from './Button';
 import Img from "./image.png";
@@ -8,12 +8,12 @@ const words = ["Empowering Women", "Inspiring Change", "Building Community", "Fo
 
 const Hero = () => {
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start end', 'end start'],
-  });
+  // const { scrollYProgress } = useScroll({
+  //   target: heroRef,
+  //   offset: ['start end', 'end start'],
+  // });
 
-  const translateY = useTransform(scrollYProgress, [0, 1], [150, -150]);
+  // const translateY = useTransform(scrollYProgress, [0, 1], [150, -150]);
 
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
@@ -75,7 +75,7 @@ const Hero = () => {
             transition={{
               repeat: Infinity,
               repeatType: 'mirror',
-              duration: 1000,
+              duration: 3,
               ease: 'easeInOut',
             }}
           />

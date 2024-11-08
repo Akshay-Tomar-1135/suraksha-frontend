@@ -57,12 +57,14 @@ module.exports = {
     'react/jsx-no-duplicate-props': [1, { ignoreCase: false }],
     'react/jsx-no-useless-fragment': [1, { allowExpressions: true }],
     'react/no-unstable-nested-components': [1, { allowAsProps: true }],
+    'react/prop-types': 1,
     // jsx-a11y
     'jsx-a11y/anchor-is-valid': 0,
     'jsx-a11y/control-has-associated-label': 0,
     'jsx-a11y/label-has-associated-control': 0,
     // unused imports
     'import/no-absolute-path': 0,
+    'consistent-return': 1,
     'unused-imports/no-unused-imports': 1,
     'unused-imports/no-unused-vars': [
       0,

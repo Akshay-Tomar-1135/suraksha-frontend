@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
-import Button from 'src/components/Button';
+import Button from 'src/components/landing-page/Button';
 import { Severity, userTypeKey, UserTypes } from 'src/_mock';
 import { useAppDispatch, useAppSelector } from 'src/store/reduxHooks';
 import { fetchUser, setUserType } from 'src/store/features/userConfig/userConfigSlice';
