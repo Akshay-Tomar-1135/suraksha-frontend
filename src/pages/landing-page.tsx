@@ -1,11 +1,11 @@
-import BrandSlide from 'src/components/BrandSlide';
-import Footer from 'src/components/Footer';
-import Header from 'src/components/Header';
-import Hero from 'src/components/Hero';
-import ProductShowcase from 'src/components/ProductShowcase';
-import Testimonials from 'src/components/Testimonials';
-import FeedbackForm from 'src/components/Feedback';
-import FAQSection from 'src/components/FAQ';
+import BrandSlide from 'src/components/landing-page/BrandSlide';
+import Footer from 'src/components/landing-page/Footer';
+import Header from 'src/components/landing-page/Header';
+import Hero from 'src/components/landing-page/Hero';
+import ProductShowcase from 'src/components/landing-page/ProductShowcase';
+import Testimonials from 'src/components/landing-page/Testimonials';
+import FeedbackForm from 'src/components/landing-page/Feedback';
+import FAQSection from 'src/components/landing-page/FAQ';
 
 export default function LandingPage() {
   return (
