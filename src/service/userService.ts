@@ -11,7 +11,7 @@ import {
 } from 'src/interface/UserConfig';
 
 class UserService {
-  private baseUrl = 'http://localhost:8000'; // process.env.VITE_BACKEND_URL;
+  private baseUrl = import.meta.env.VITE_BACKEND_URL;
 
   public async getUserDetails(
     query: UserDetailQuery

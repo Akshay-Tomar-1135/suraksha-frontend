@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { faq } from '../_mock/_data';
+import { faq } from '../../_mock/_data';
 
 // Define the type for your FAQ items
 type FaqItem = {

@@ -7,7 +7,7 @@ import { RouterLink } from 'src/routes/components';
 
 import { stylesMode } from 'src/theme/styles';
 
-import Logo from '../../../public/assets/images/main-logo.png';
+import Logo from '/assets/images/main-logo.png';
 
 import { Main } from './main';
 import { HeaderSection } from '../core/header-section';

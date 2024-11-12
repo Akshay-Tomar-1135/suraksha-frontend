@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 
 import { RouterLink } from 'src/routes/components';
 
-import Logo from '../../../public/assets/images/main-logo.png';
+import Logo from '/assets/images/main-logo.png';
 
 import { Main, CompactContent } from './main';
 import { LayoutSection } from '../core/layout-section';

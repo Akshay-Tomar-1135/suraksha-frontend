@@ -14,10 +14,10 @@ import { RouterLink } from 'src/routes/components';
 import { varAlpha } from 'src/theme/styles';
 
 import { Scrollbar } from 'src/components/scrollbar';
-import  Logo  from '../../../public/assets/images/main-logo.png';
+import  Logo  from '/assets/images/main-logo.png';
 
-import { NavUpgrade } from '../components/nav-upgrade';
-import { WorkspacesPopover } from '../components/workspaces-popover';
+// import { NavUpgrade } from '../components/nav-upgrade';
+// import { WorkspacesPopover } from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
 
