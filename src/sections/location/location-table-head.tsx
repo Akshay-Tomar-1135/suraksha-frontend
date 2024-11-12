@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import TableRow from '@mui/material/TableRow';
-// import Checkbox from '@mui/material/Checkbox';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -14,7 +13,6 @@ type UserTableHeadProps = {
   order: 'asc' | 'desc';
   onSort: (id: string) => void;
   headLabel: Record<string, any>[];
-  // onSelectAllRows: (checked: boolean) => void;
 };
 
 export function UserTableHead({
@@ -22,20 +20,10 @@ export function UserTableHead({
   onSort,
   orderBy,
   headLabel,
-  // onSelectAllRows,
 }: UserTableHeadProps) {
   return (
     <TableHead>
       <TableRow>
-        {/* <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              onSelectAllRows(event.target.checked)
-            }
-          />
-        </TableCell> */}
 
 {headLabel.map((headCell, index) => (
   <TableCell
@@ -49,7 +37,7 @@ export function UserTableHead({
   >
     <Box
       sx={{
-        ...(index === 0 && { ml: 3 }),  // Apply margin to the content inside the first TableCell
+        ...(index === 0 && { ml: 3 }),  
       }}
     >
       <TableSortLabel

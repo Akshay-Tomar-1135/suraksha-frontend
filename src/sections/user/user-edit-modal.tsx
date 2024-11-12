@@ -1,5 +1,5 @@
-// user-edit-modal.tsx
 import React, { useState, useEffect } from 'react';
+
 import {
   Box,
   Button,
@@ -8,10 +8,9 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import { useToast } from 'src/components/snackBar/ToastContext';
+import { userService } from 'src/service/userService';
 
 type UserEditModalProps = {
   open: boolean;
@@ -19,20 +18,25 @@ type UserEditModalProps = {
   user: {
     id: string;
     name: string;
-    company: string;
-    role: string;
+    phoneNum: string;
     status: string;
-    isVerified: boolean;
-    // avatarUrl: string;
+    relation: string;
+    avatarUrl?: string;
+    email: string;
+    latitude: number;
+    longitude: number;
+    priority: number;
   };
   onEditUser: (updatedUser: {
     id: string;
     name: string;
-    company: string;
-    role: string;
-    isVerified: boolean;
+    relation: string;
+    phoneNum: string;
+    email: string;
     status: string;
-    // avatarUrl: string;
+    latitude: number;
+    longitude: number;
+    priority: number;
   }) => void;
 };
 
@@ -41,30 +45,32 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
   const { showToast } = useToast();
 
   const [name, setName] = useState(user.name);
-  const [company, setCompany] = useState(user.company);
-  const [role, setRole] = useState(user.role);
-  const [status, setStatus] = useState(user.status);
+  const [relation, setRelation] = useState(user.relation);
+  const [phoneNum, setPhoneNum] = useState(user.phoneNum);
+  const [email, setEmail] = useState(user.email);
 
   const [errors, setErrors] = useState({
     name: false,
-    company: false,
-    role: false,
-    status: false,
+    relation: false,
+    phoneNum: false,
+    email: false,
   });
 
   useEffect(() => {
-    setName(user.name);
-    setCompany(user.company);
-    setRole(user.role);
-    setStatus(user.status);
-  }, [user]);
+    if (open) {
+      setName(user.name);
+      setRelation(user.relation);
+      setPhoneNum(user.phoneNum);
+      setEmail(user.email);
+    }
+  }, [open, user]);
 
   const handleClose = () => {
     setErrors({
       name: false,
-      company: false,
-      role: false,
-      status: false,
+      relation: false,
+      phoneNum: false,
+      email: false,
     });
     onClose();
   };
@@ -72,9 +78,9 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
   const validateFields = () => {
     const newErrors = {
       name: name.trim() === '',
-      company: company.trim() === '',
-      role: role.trim() === '',
-      status: status.trim() === '',
+      relation: relation.trim() === '',
+      phoneNum: phoneNum.trim() === '',
+      email: email.trim() === '',
     };
     setErrors(newErrors);
     return !Object.values(newErrors).some((error) => error);
@@ -84,21 +90,22 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
     if (validateFields()) {
       try {
         
-        const result = await updateUserContact(user.role, {
+        const result = await userService.updateUserContact({
+          old_phone_number: user.phoneNum,
+          aadhaar_number: 123456789, // hardcoded for the time being
           name,
-          company,
-          relation: '', 
-          new_phone_number: role,
-          email: '', 
-          status,
-          priority: 1, 
-          latitude: 0, 
-          longitude: 0, 
+          relation,
+          new_phone_number: phoneNum,
+          email,
+          status: user.status,
+          priority: user.priority,
+          latitude: user.latitude,
+          longitude: user.longitude,
         });
 
         if (result.success) {
           showToast('User updated successfully', {severity: 'success'});
-          onEditUser({ id: user.id, name, company, role, isVerified: user.isVerified, status });
+          onEditUser({ id: user.id, name, relation, phoneNum, email, status: user.status, latitude: user.latitude, longitude: user.longitude, priority: user.priority});
           handleClose();
         } else {
           showToast(`Error: ${result.message}`, { severity: 'error' });
@@ -114,16 +121,16 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
     <>
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth='sm'
       fullWidth
       aria-labelledby="form-dialog-title"
       sx={{
         '& .MuiDialog-paper': {
-          borderRadius: 2, // Rounded corners
-          padding: 2, // Adds padding around the dialog content
-          boxShadow: 5, // Adds a shadow to the dialog
-          bgcolor: 'background.default', // Background color from theme
+          borderRadius: 2, 
+          padding: 2, 
+          boxShadow: 5,
+          bgcolor: 'background.default',
         },
       }}
     >
@@ -133,8 +140,6 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
         fontSize: 20,
         fontWeight: 'bold',
         textAlign: 'center',
-        // color: 'primary.main',
-        // mb: 2,
       }}>
         Edit User
       </DialogTitle>
@@ -154,31 +159,31 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
             helperText={errors.name ? 'Name is required' : ''}
           />
           <TextField
-            label="Company"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
+            label="Relation"
+            value={relation}
+            onChange={(e) => setRelation(e.target.value)}
             fullWidth
             required
-            error={errors.company}
-            helperText={errors.company ? 'Company is required' : ''}
+            error={errors.relation}
+            helperText={errors.relation ? 'Relation is required' : ''}
           />
           <TextField
-            label="Role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
+            label="Phone Number"
+            value={phoneNum}
+            onChange={(e) => setPhoneNum(e.target.value)}
             fullWidth
             required
-            error={errors.role}
-            helperText={errors.role ? 'Role is required' : ''}
+            error={errors.phoneNum}
+            helperText={errors.phoneNum ? 'Phone Number is required' : ''}
           />
           <TextField
-            label="Status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
-            error={errors.status}
-            helperText={errors.status ? 'Status is required' : ''}
+            error={errors.email}
+            helperText={errors.email ? 'Email is required' : ''}
           />
         </Box>
       </DialogContent>
@@ -192,37 +197,4 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
 
   </>
   );
-}
-
-async function updateUserContact(oldPhoneNumber: string, updatedContactData: any) {
-  try {
-    const response = await fetch('http://localhost:8000/update_user_contact', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        phone_number: oldPhoneNumber, // Old phone number
-        aadhaar_number: 123456789,
-        name: updatedContactData.name,
-        relation: updatedContactData.company,
-        new_phone_number: updatedContactData.new_phone_number, // New phone number
-        email: updatedContactData.email,
-        status: updatedContactData.status,
-        priority: updatedContactData.priority,
-        latitude: updatedContactData.latitude,
-        longitude: updatedContactData.longitude,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      return { success: true, message: data.message };
-    }
-    return { success: false, message: data.message };
-  } catch (error) {
-    console.error('Error updating user contact:', error);
-    return { success: false, message: 'An error occurred while updating the user contact.' };
-  }
 }

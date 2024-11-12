@@ -1,4 +1,3 @@
-// confirm-delete-dialog.tsx
 import {
     Dialog,
     DialogActions,
@@ -11,7 +10,7 @@ import {
     open: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    userName?: string; // Optionally show the user's name
+    userName?: string; 
   };
   
   export function ConfirmDeleteDialog({
@@ -25,7 +24,8 @@ import {
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete {userName ? `"${userName}"` : 'this user'}?
+        Are you sure you want to delete{' '}
+        {userName ? <strong>&quot;{userName}&quot;</strong> : 'this user'}?
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

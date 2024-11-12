@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { useToast } from 'src/components/snackBar/ToastContext'; 
+import { userService } from 'src/service/userService';
 
-import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
@@ -28,6 +28,7 @@ import type { UserProps } from '../user-table-row';
 import { UserAddModal } from '../user-add-modal';
 import { UserEditModal } from '../user-edit-modal';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog';
+
 // ----------------------------------------------------------------------
 
 export function UserView() {
@@ -35,14 +36,14 @@ export function UserView() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [users, setUsers] = useState<UserProps[]>(_users); // State to store users
-  const [isAddModalOpen, setAddModalOpen] = useState(false); // State to control modal
+  const [users, setUsers] = useState<UserProps[]>([]); 
+  const [isAddModalOpen, setAddModalOpen] = useState(false); 
   
-  const [isEditModalOpen, setEditModalOpen] = useState(false); // State to control Edit Modal
-  const [currentUser, setCurrentUser] = useState<UserProps | null>(null); // Store current user to edit
+  const [isEditModalOpen, setEditModalOpen] = useState(false); 
+  const [currentUser, setCurrentUser] = useState<UserProps | null>(null); 
 
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete dialog
-  const [userToDelete, setUserToDelete] = useState<UserProps | null>(null); // Track the user to delete
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false); 
+  const [userToDelete, setUserToDelete] = useState<UserProps | null>(null); 
 
   const { showToast } = useToast();
 
@@ -57,7 +58,7 @@ export function UserView() {
   };
 
   const handleOpenEditModal = (user: UserProps) => {
-    setCurrentUser(user); // Set the user to be edited
+    setCurrentUser(user); 
     setEditModalOpen(true);
   };
   const handleCloseEditModal = () => setEditModalOpen(false);
@@ -70,48 +71,19 @@ export function UserView() {
     );
   };
 
-  // const handleDeleteUser = (userId: string) => {
-  //   setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-  // };
-
-  async function deleteUserContact(phoneNumber: string) {
-    try {
-      const response = await fetch(`http://localhost:8000/delete_user_contact`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ phone_number: phoneNumber }), 
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        return { success: true, message: data.message };
-      } 
-      
-      return { success: false, message: data.message };
-      
-    } catch (error) {
-      console.error('Error deleting user contact:', error);
-      return { success: false, message: 'An error occurred while deleting the user contact.' };
-    }
-  }
-
   const handleDeleteUser = async () => {
     if (userToDelete) {
       try {
-        const result = await deleteUserContact(userToDelete.role);
+        const result = await userService.deleteUserContact(userToDelete.phoneNum);
   
         if (result.success) {
           setUsers((prevUsers) =>
             prevUsers.filter((user) => user.id !== userToDelete.id)
           );
-  
-          // Show success snackbar
+
           showToast('User deleted successfully', {severity: 'success'});
         } else {
-          // Show error snackbar
+
           showToast(`Failed to delete user: ${result.message}`, { severity: 'error' });
 
         }
@@ -124,19 +96,17 @@ export function UserView() {
     }
   };
 
-  // Open delete confirmation dialog
   const handleOpenDeleteDialog = (user: UserProps) => {
-    setUserToDelete(user); // Store the user to delete
-    setDeleteDialogOpen(true); // Open the dialog
+    setUserToDelete(user); 
+    setDeleteDialogOpen(true); 
   };
 
   const handleCloseDeleteDialog = () => {
-    setDeleteDialogOpen(false); // Close the dialog without deleting
-    setUserToDelete(null); // Reset the user to delete
+    setDeleteDialogOpen(false); 
+    setUserToDelete(null); 
   };
 
   const dataFiltered: UserProps[] = applyFilter({
-    // inputData: _users,
     inputData: users, 
     comparator: getComparator(table.order, table.orderBy),
     filterName,
@@ -187,10 +157,12 @@ export function UserView() {
                 }
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Relation' },
-                  { id: 'role', label: 'Phone Number' },
-                  { id: 'isVerified', label: 'Email', align: 'center' },
+                  { id: 'relation', label: 'Relation' },
+                  { id: 'phoneNum', label: 'Phone Number' },
+                  { id: 'email', label: 'Email', align: 'center' },
                   { id: 'status', label: 'Status' },
+                  { id: 'priority', label: 'Priority' },
+                  { id: 'location', label: 'Location' }, 
                   { id: '' },
                 ]}
               />
@@ -206,7 +178,7 @@ export function UserView() {
                       row={row}
                       selected={table.selected.includes(row.id)}
                       onSelectRow={() => table.onSelectRow(row.id)}
-                      onEditRow={() => handleOpenEditModal(row)} // Open the edit modal
+                      onEditRow={() => handleOpenEditModal(row)} 
                       onDeleteRow={() => handleOpenDeleteDialog(row)}
                     />
                   ))}
@@ -254,8 +226,8 @@ export function UserView() {
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
           onClose={handleCloseDeleteDialog}
-          onConfirm={handleDeleteUser} // Confirm deletion
-          userName={userToDelete.name} // Optionally pass the user's name
+          onConfirm={handleDeleteUser} 
+          userName={userToDelete.name} 
         />
       )}
 

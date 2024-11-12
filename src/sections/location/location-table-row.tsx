@@ -5,6 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import Rating from '@mui/material/Rating';
 import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
@@ -45,9 +46,6 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-        {/* <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
-        </TableCell> */}
 
         <TableCell component="th" scope="row" >
           <Box gap={2} display="flex" alignItems="center" sx={{ ml: 3 }}>
@@ -58,7 +56,14 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
 
         <TableCell>{row.company}</TableCell>
 
-        <TableCell>{row.role}</TableCell>
+        <TableCell>
+          <Rating
+            value={4} // Hardcoded value
+            max={5}
+            readOnly
+            precision={0.5}
+          />
+        </TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>

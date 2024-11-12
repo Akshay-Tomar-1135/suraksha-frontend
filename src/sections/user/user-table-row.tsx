@@ -13,16 +13,17 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 
-// ----------------------------------------------------------------
-
 export type UserProps = {
   id: string;
   name: string;
-  role: string;
+  phoneNum: string;
   status: string;
-  company: string;
-  avatarUrl?: string; // Optional avatarUrl property
-  isVerified: boolean;
+  relation: string;
+  avatarUrl?: string;
+  email: string;
+  latitude: number;
+  longitude: number;
+  priority: number;
 };
 
 type UserTableRowProps = {
@@ -33,7 +34,7 @@ type UserTableRowProps = {
   onDeleteRow: () => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow, onEditRow, onDeleteRow}: UserTableRowProps) {
+export function UserTableRow({ row, selected, onSelectRow, onEditRow, onDeleteRow }: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -51,30 +52,24 @@ export function UserTableRow({ row, selected, onSelectRow, onEditRow, onDeleteRo
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell component="th" scope="row">
-          <Box gap={2} display="flex" alignItems="center">
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>
+          <Box display="flex" alignItems="center" gap={1}>
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
-
-        <TableCell>{row.role}</TableCell>
-
-        <TableCell align="center">
-          {row.isVerified ? (
-            <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
-          ) : (
-            '-'
-          )}
-        </TableCell>
-
-        <TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.relation}</TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.phoneNum}</TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.email}</TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>
           <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
         </TableCell>
-
-        <TableCell align="right">
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>{row.priority}</TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>
+          {`${row.latitude}, ${row.longitude}`}
+        </TableCell>
+        <TableCell sx={{ px: 2, py: 1, textAlign: 'right' }}>
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
