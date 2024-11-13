@@ -39,6 +39,12 @@ type TravelModesType = {
   [key: string]: { icon: React.ElementType; color: string; travelType: google.maps.TravelMode };
 };
 
+const mapContainerStyle = {
+  height: '100%',
+  width: '100%',
+  borderRadius: '10px',
+};
+
 const RenderMap = () => {
   const [center, setCenter] = useState<LatLng>({ lat: 12.9981, lng: 77.6829 });
   const source: LatLng = { lat: 12.9881, lng: 77.6829 };
@@ -174,7 +180,7 @@ const RenderMap = () => {
     index: number
   ) => {
     const polyline = directionsRenderer.getDirections()?.routes[0].overview_path;
-    console.log(polyline);
+    // console.log(polyline);
     // Add click listener to the polyline
     // google.maps.event.addListener(directionsRenderer.getDirections().routes[0].overview_polyline, 'click', () => {
     //   handleRouteClick(route, index);
@@ -228,9 +234,9 @@ const RenderMap = () => {
                   ),
                 }}
               />
-            {/* </div> */}
+              {/* </div> */}
 
-            {/* <div className="flex-1"> */}
+              {/* <div className="flex-1"> */}
               <TextField
                 label="Destination (lng, lat)"
                 variant="outlined"
@@ -247,37 +253,37 @@ const RenderMap = () => {
               />
             </div>
             <div className="flex flex-row md:flex-col lg:flex-row gap-4 items-center justify-evenly">
-            {travelModes && (
-              <div className="flex gap-4 items-center">
-                {Object.keys(travelModes).map((mode) => {
-                  const Icon = travelModes[mode].icon;
-                  return (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => handleTravelTypeChange(travelModes[mode].travelType)}
-                      className={`bg-${
-                        travelType === travelModes[mode].travelType
-                          ? travelModes[mode].color
-                          : 'gray-500'
-                      } text-white p-2 rounded-full`}
-                    >
-                      <Icon />
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              {travelModes && (
+                <div className="flex gap-4 items-center">
+                  {Object.keys(travelModes).map((mode) => {
+                    const Icon = travelModes[mode].icon;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => handleTravelTypeChange(travelModes[mode].travelType)}
+                        className={`bg-${
+                          travelType === travelModes[mode].travelType
+                            ? travelModes[mode].color
+                            : 'gray-500'
+                        } text-white p-2 rounded-full`}
+                      >
+                        <Icon />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
-            <button
-              type="button"
-              onClick={startJourney}
-              className={`${
-                isJourneyStarted ? 'bg-red-500 hover:bg-red-700' : 'bg-black hover:bg-gray-700'
-              } text-white py-2 px-5 rounded-md shadow-md transition ease-in-out duration-300 flex-1 md:flex-none lg:flex-1`}
-            >
-              {isJourneyStarted ? 'End Journey' : 'Start Journey'}
-            </button>
+              <button
+                type="button"
+                onClick={startJourney}
+                className={`${
+                  isJourneyStarted ? 'bg-red-500 hover:bg-red-700' : 'bg-black hover:bg-gray-700'
+                } text-white py-2 px-5 rounded-md shadow-md transition ease-in-out duration-300 flex-1 md:flex-none lg:flex-1`}
+              >
+                {isJourneyStarted ? 'End Journey' : 'Start Journey'}
+              </button>
             </div>
           </div>
 
@@ -352,7 +358,7 @@ const RenderMap = () => {
 
         <div className="w-full h-[75vh] border border-black border-opacity-50 relative rounded-lg bg-white">
           <GoogleMap
-            // className="h-full w-full rounded-lg"
+            mapContainerStyle={mapContainerStyle}
             center={source || center}
             options={{
               gestureHandling: 'greedy',
