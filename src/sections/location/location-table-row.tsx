@@ -46,8 +46,7 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-
-        <TableCell component="th" scope="row" >
+        <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center" sx={{ ml: 3 }}>
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
