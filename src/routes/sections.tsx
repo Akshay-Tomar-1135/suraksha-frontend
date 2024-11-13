@@ -16,6 +16,8 @@ export const LandingPage = lazy(() => import('src/pages/landing-page'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const UserHistory = lazy(() => import('src/pages/user-history'));
+export const LocationPage = lazy(() => import('src/pages/location'));
+export const ProfilePage = lazy(() => import('src/pages/profile'));
 export const SignInPage = lazy(() => import('src/pages/auth'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -48,9 +50,11 @@ export function Router() {
       children: [
         { path: 'dashboard', element: <> <HomePage /> <LiveLocation userId = "1" /></>, index: true },
         { path: 'user', element: <UserPage /> },
+        { path: 'location', element: <LocationPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        {path: 'user-history', element: <UserHistory />}
+        {path: 'user-history', element: <UserHistory />},
+        { path: 'profile', element: <ProfilePage /> },
       ],
     },
     {
