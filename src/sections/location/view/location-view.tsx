@@ -45,13 +45,7 @@ export function LocationView() {
         <Typography variant="h4" flexGrow={1}>
           Locations
         </Typography>
-        {/* <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-        >
-          New Location
-        </Button> */}
+        
       </Box>
 
       <Card>
@@ -71,7 +65,7 @@ export function LocationView() {
                 orderBy={table.orderBy}
                 onSort={table.onSort}
                 headLabel={[
-                  { id: 'name', label: 'Name' },
+                  { id: 'places', label: 'Places' },
                   { id: 'state', label: 'State' },
                   { id: 'rating', label: 'Rating' },
                   { id: '' },
@@ -88,7 +82,7 @@ export function LocationView() {
                       key={row.id}
                       row={row}
                       selected={table.selected.includes(row.id)}
-                      // onSelectRow={() => table.onSelectRow(row.id)}
+                      
                     />
                   ))}
 

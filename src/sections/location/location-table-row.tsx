@@ -29,7 +29,6 @@ export type UserProps = {
 type UserTableRowProps = {
   row: UserProps;
   selected: boolean;
-  // onSelectRow: () => void;
 };
 
 export function UserTableRow({ row, selected }: UserTableRowProps) {
@@ -48,7 +47,6 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
         <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center" sx={{ ml: 3 }}>
-            <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
         </TableCell>
@@ -64,14 +62,14 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
           />
         </TableCell>
 
-        <TableCell align="right">
+        {/* <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
 
-      <Popover
+      {/* <Popover
         open={!!openPopover}
         anchorEl={openPopover}
         onClose={handleClosePopover}
@@ -104,7 +102,7 @@ export function UserTableRow({ row, selected }: UserTableRowProps) {
             Delete
           </MenuItem>
         </MenuList>
-      </Popover>
+      </Popover> */}
     </>
   );
 }
