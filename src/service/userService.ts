@@ -10,6 +10,11 @@ import {
   SignInQuery,
 } from 'src/interface/UserConfig';
 
+import {
+  AddUserContactQuery,
+  UpdateUserContactQuery,
+} from 'src/interface/UserContact';
+
 class UserService {
   private baseUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -133,6 +138,105 @@ class UserService {
     const res = await response.json();
     return res;
   }
+
+  public async addUserContact(query: AddUserContactQuery): Promise<Response> {
+    const { aadhaar_number, name, relation, phone_number, email, status, priority, latitude, longitude } = query;
+  
+    try {
+      const response = await fetch(`${this.baseUrl}/add_user_contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({
+          aadhaar_number,
+          name,
+          relation,
+          phone_number,
+          email,
+          status,
+          priority,
+          latitude,
+          longitude,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData: ErrorResponse = await response.json();
+        throw new Error(errorData.message || `Error: ${response.statusText}`);
+      }
+  
+      return response;
+    } catch (error) {
+      console.error('Error adding user contact:', error);
+      throw new Error('An error occurred while adding the user contact.');
+    }
+  }
+
+  public async updateUserContact(query: UpdateUserContactQuery): Promise<{ success: boolean; message: string }> {
+    const { old_phone_number, aadhaar_number, name, relation, new_phone_number, email, status, priority, latitude, longitude } = query;
+  
+    try {
+      const response = await fetch(`${this.baseUrl}/update_user_contact`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({
+          
+          phone_number: old_phone_number,
+          aadhaar_number,
+          name,
+          relation,
+          new_phone_number,
+          email,
+          status,
+          priority,
+          latitude,
+          longitude,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || `Error: ${response.statusText}`);
+      }
+  
+      return { success: true, message: data.message };
+    } catch (error) {
+      console.error('Error updating user contact:', error);
+      return { success: false, message: 'An error occurred while updating the user contact.' };
+    }
+  }
+
+  public async deleteUserContact(phoneNumber: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/delete_user_contact`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({ phone_number: phoneNumber }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        return { success: true, message: data.message };
+      }
+  
+      return { success: false, message: data.message };
+  
+    } catch (error) {
+      console.error('Error deleting user contact:', error);
+      return { success: false, message: 'An error occurred while deleting the user contact.' };
+    }
+  }
+  
 }
 
 export const userService = new UserService();
