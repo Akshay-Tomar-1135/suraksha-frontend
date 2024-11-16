@@ -3,14 +3,14 @@ import { Box, Button, TextField, Avatar, Typography, Card, Grid, Modal, InputAdo
 
 export function ProfileView() {
   const [profile, setProfile] = useState({
-    name: 'John Doe',
+    name: 'Ankit Gupta',
     phoneNumber: '1234567890',
     aadharNumber: '****5678',
-    state: 'California',
+    state: 'Shajapur',
     age: '25',
-    gender: 'Male',
-    email: 'john.doe@example.com',
-    avatar: '/path/to/avatar.jpg', // Your avatar image path here
+    gender: 'Shemale',
+    email: 'ankit.gupta@example.com',
+    avatar: '/path/to/avatar.jpg', 
   });
 
   const [openModal, setOpenModal] = useState(false);
@@ -32,7 +32,7 @@ export function ProfileView() {
     <Box sx={{ p: 4 }}>
       <Card sx={{ p: 3, boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', maxWidth: 900, mx: 'auto' }}>
         <Grid container spacing={3}>
-          {/* Avatar + Name/Title */}
+          
           <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>
             <Avatar
               src={profile.avatar}
@@ -41,9 +41,6 @@ export function ProfileView() {
             />
             <Typography variant="h5" fontWeight="bold">{profile.name}</Typography>
             <Typography variant="subtitle1" color="textSecondary">{profile.state}</Typography>
-            {/* <Typography variant="body2" sx={{ mt: 1, cursor: 'pointer', color: '#1976d2' }}>
-              Avatar by gravatar.com. Or upload your own...
-            </Typography> */}
           </Grid>
 
           {/* Profile Information */}
@@ -74,7 +71,7 @@ export function ProfileView() {
                 InputProps={{ readOnly: true }}
                 fullWidth
               />
-              
+
               {/* Age Group and Gender in the same row */}
               <Grid container spacing={2}>
                 <Grid item xs={6}>

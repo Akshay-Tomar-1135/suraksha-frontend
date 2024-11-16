@@ -63,7 +63,7 @@ export function Router() {
         { path: 'location', element: <LocationPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        { path: 'user-history', element: <UserHistory /> },
+        { path: 'travel-history', element: <UserHistory />},
         { path: 'find-my-buddy', element: <FindMyBuddy /> },
         { path: 'profile', element: <ProfilePage /> },
       ],
