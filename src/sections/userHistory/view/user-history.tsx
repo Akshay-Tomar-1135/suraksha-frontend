@@ -22,7 +22,7 @@ export const UserHistory: React.FC = () => {
       {/* User History Header */}
       <Box display="flex" alignItems="center" mb={3}>
         <Typography variant="h4" flexGrow={1}>
-          User History
+          Travel History
         </Typography>
       </Box>
       <Card sx={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.75rem' }}>
