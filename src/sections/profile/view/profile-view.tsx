@@ -43,6 +43,7 @@ export function ProfileView() {
             <Typography variant="subtitle1" color="textSecondary">{profile.state}</Typography>
           </Grid>
 
+          {/* Profile Information */}
           <Grid item xs={12} sm={8}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>Profile Information</Typography>
             <Box component="div" sx={{ display: 'grid', gap: 2 }}>
@@ -70,7 +71,8 @@ export function ProfileView() {
                 InputProps={{ readOnly: true }}
                 fullWidth
               />
-              
+
+              {/* Age Group and Gender in the same row */}
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextField
