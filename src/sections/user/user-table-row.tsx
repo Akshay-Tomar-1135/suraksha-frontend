@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
@@ -9,22 +8,9 @@ import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
-
+import type { UserProps } from 'src/interface/UserContact';
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
-
-export type UserProps = {
-  id: string;
-  name: string;
-  phoneNum: string;
-  status: string;
-  relation: string;
-  avatarUrl?: string;
-  email: string;
-  latitude: number;
-  longitude: number;
-  priority: number;
-};
 
 type UserTableRowProps = {
   row: UserProps;
@@ -52,24 +38,30 @@ export function UserTableRow({ row, selected, onSelectRow, onEditRow, onDeleteRo
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>
-          <Box display="flex" alignItems="center" gap={1}>
+        <TableCell component="th" scope="row">
+          <Box gap={2} display="flex" alignItems="center">
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
         </TableCell>
 
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.relation}</TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.phoneNum}</TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'left' }}>{row.email}</TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>
-          <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
+        <TableCell>{row.relation}</TableCell>
+
+        <TableCell>{row.phoneNum}</TableCell>
+
+        <TableCell >
+          {row.email}
         </TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>{row.priority}</TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'center' }}>
-          {`${row.latitude}, ${row.longitude}`}
+
+        <TableCell>
+          <Label color={(row.status === 'inactive' && 'error') || 'success'}>{row.status}</Label>
         </TableCell>
-        <TableCell sx={{ px: 2, py: 1, textAlign: 'right' }}>
+
+        <TableCell align="center">
+          {row.priority}
+        </TableCell>
+
+        <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>

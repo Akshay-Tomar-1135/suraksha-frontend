@@ -70,7 +70,8 @@ export function ProfileView() {
                 InputProps={{ readOnly: true }}
                 fullWidth
               />
-              
+
+              {/* Age Group and Gender in the same row */}
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextField

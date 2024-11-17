@@ -21,7 +21,12 @@ export const navData = [
   {
     title: 'Travel History',  
     path: '/travel-history',  
-    icon: icon('ic-history'),  
+    icon: icon('ic-history'),
+  },
+  {
+    title: 'Find My Buddy',
+    path: '/find-my-buddy',
+    icon: icon('ic-buddy'),
   },
   {
     title: 'Locations',

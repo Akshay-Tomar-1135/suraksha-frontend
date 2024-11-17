@@ -236,6 +236,28 @@ class UserService {
       return { success: false, message: 'An error occurred while deleting the user contact.' };
     }
   }
+
+  public async getAllUserContacts(): Promise<Response> {
+    try {
+      const response = await fetch(`${this.baseUrl}/get_all_user_contacts`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData: ErrorResponse = await response.json();
+        throw new Error(errorData.message || `Error: ${response.statusText}`);
+      }
+  
+      return response;
+    } catch (error) {
+      console.error('Error fetching user contacts:', error);
+      throw new Error('An error occurred while fetching the user contacts.');
+    }
+  }
   
 }
 

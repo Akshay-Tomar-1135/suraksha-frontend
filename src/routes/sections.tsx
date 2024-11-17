@@ -7,7 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
-import  LiveLocation from 'src/components/web_sockets/LiveLocationWebSocket';
+import LiveLocation from 'src/components/web_sockets/LiveLocationWebSocket';
 
 // ----------------------------------------------------------------------
 
@@ -21,6 +21,7 @@ export const ProfilePage = lazy(() => import('src/pages/profile'));
 export const SignInPage = lazy(() => import('src/pages/auth'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const FindMyBuddy = lazy(() => import('src/pages/find-my-buddy'));
 
 // ----------------------------------------------------------------------
 
@@ -48,12 +49,22 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { path: 'dashboard', element: <> <HomePage /> <LiveLocation userId = "1" /></>, index: true },
+        {
+          path: 'dashboard',
+          element: (
+            <>
+              {' '}
+              <HomePage /> <LiveLocation userId="1" />
+            </>
+          ),
+          index: true,
+        },
         { path: 'user', element: <UserPage /> },
         { path: 'location', element: <LocationPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        {path: 'travel-history', element: <UserHistory />},
+        { path: 'travel-history', element: <UserHistory />},
+        { path: 'find-my-buddy', element: <FindMyBuddy /> },
         { path: 'profile', element: <ProfilePage /> },
       ],
     },
@@ -67,7 +78,7 @@ export function Router() {
     },
     {
       path: '/',
-      element: <LandingPage />
+      element: <LandingPage />,
     },
     {
       path: '404',

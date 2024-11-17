@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -16,14 +18,18 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
+import { RootState } from 'src/store/store';
+import { addContact, editContact, deleteContact, setContacts } from 'src/store/features/userContacts/userContactsSlice';
+
+import type { UserProps, UserContact } from 'src/interface/UserContact';
+
+import { TableNoEntry } from '../table-no-entry';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
-import type { UserProps } from '../user-table-row';
 
 import { UserAddModal } from '../user-add-modal';
 import { UserEditModal } from '../user-edit-modal';
@@ -33,10 +39,11 @@ import { ConfirmDeleteDialog } from '../confirm-delete-dialog';
 
 export function UserView() {
   const table = useTable();
+  const dispatch = useDispatch();
+  const users = useSelector((state: RootState) => state.userContacts.contacts);
 
   const [filterName, setFilterName] = useState('');
 
-  const [users, setUsers] = useState<UserProps[]>([]); 
   const [isAddModalOpen, setAddModalOpen] = useState(false); 
   
   const [isEditModalOpen, setEditModalOpen] = useState(false); 
@@ -47,6 +54,33 @@ export function UserView() {
 
   const { showToast } = useToast();
 
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await userService.getAllUserContacts();
+        const data: UserContact[] = await response.json();
+
+        const transformedData: UserProps[] = data.map((contact) => ({
+          id: nanoid(),
+          name: contact.name,
+          relation: contact.relation,
+          phoneNum: contact.phone_number, 
+          email: contact.email,
+          status: contact.status,
+          priority: contact.priority,
+          latitude: 0, 
+          longitude: 0,
+        }));
+
+        dispatch(setContacts(transformedData)); 
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      }
+    };
+
+    fetchContacts();
+  }, [dispatch]);
+
   const handleOpenAddModal = () => {
     console.log('Opening Modal');
     setAddModalOpen(true);
@@ -54,7 +88,7 @@ export function UserView() {
   const handleCloseAddModal = () => setAddModalOpen(false);
 
   const handleAddUser = (newUser: UserProps) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
+    dispatch(addContact(newUser));
   };
 
   const handleOpenEditModal = (user: UserProps) => {
@@ -64,11 +98,7 @@ export function UserView() {
   const handleCloseEditModal = () => setEditModalOpen(false);
 
   const handleEditUser = (updatedUser: UserProps) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      )
-    );
+    dispatch(editContact(updatedUser));
   };
 
   const handleDeleteUser = async () => {
@@ -77,9 +107,8 @@ export function UserView() {
         const result = await userService.deleteUserContact(userToDelete.phoneNum);
   
         if (result.success) {
-          setUsers((prevUsers) =>
-            prevUsers.filter((user) => user.id !== userToDelete.id)
-          );
+
+          dispatch(deleteContact(userToDelete.phoneNum));
 
           showToast('User deleted successfully', {severity: 'success'});
         } else {
@@ -159,15 +188,15 @@ export function UserView() {
                   { id: 'name', label: 'Name' },
                   { id: 'relation', label: 'Relation' },
                   { id: 'phoneNum', label: 'Phone Number' },
-                  { id: 'email', label: 'Email', align: 'center' },
+                  { id: 'email', label: 'Email'},
                   { id: 'status', label: 'Status' },
-                  { id: 'priority', label: 'Priority' },
-                  { id: 'location', label: 'Location' }, 
+                  { id: 'priority', label: 'Priority', align: 'center'}, 
                   { id: '' },
                 ]}
               />
               <TableBody>
-                {dataFiltered
+                {dataFiltered.length === 0 ? (<TableNoEntry />) : (
+                dataFiltered
                   .slice(
                     table.page * table.rowsPerPage,
                     table.page * table.rowsPerPage + table.rowsPerPage
@@ -181,7 +210,8 @@ export function UserView() {
                       onEditRow={() => handleOpenEditModal(row)} 
                       onDeleteRow={() => handleOpenDeleteDialog(row)}
                     />
-                  ))}
+                  ))
+                )}
 
                 <TableEmptyRows
                   height={68}
@@ -189,6 +219,7 @@ export function UserView() {
                 />
 
                 {notFound && <TableNoData searchQuery={filterName} />}
+
               </TableBody>
             </Table>
           </TableContainer>
