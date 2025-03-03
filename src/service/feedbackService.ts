@@ -23,15 +23,15 @@ class FeedbackService {
           });
       
           if (!response.ok) {
-            const errorData: { detail: string } = await response.json();
-            throw new Error(errorData.detail || `Error: ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(errorData.detail || response.statusText || response.status);
           }
       
           const data: FeedbackResponse = await response.json();
           return data;
-        } catch (error) {
-          console.error('Error submitting feedback:', error);
-          throw new Error('An error occurred while submitting the feedback.');
+        } catch (error: any) {
+          console.error('Error submitting feedback:', error.message || error);
+          throw new Error(error.message || 'An unexpected error occurred.');
         }
     }
   

@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 
 import Box from '@mui/material/Box';
@@ -17,9 +16,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-
-import { RootState } from 'src/store/store';
-import { addContact, editContact, deleteContact, setContacts } from 'src/store/features/userContacts/userContactsSlice';
 
 import type { UserProps, UserContact } from 'src/interface/UserContact';
 
@@ -39,8 +35,8 @@ import { ConfirmDeleteDialog } from '../confirm-delete-dialog';
 
 export function UserView() {
   const table = useTable();
-  const dispatch = useDispatch();
-  const users = useSelector((state: RootState) => state.userContacts.contacts);
+
+  const [users, setUsers] = useState<UserProps[]>([]);
 
   const [filterName, setFilterName] = useState('');
 
@@ -64,31 +60,29 @@ export function UserView() {
           id: nanoid(),
           name: contact.name,
           relation: contact.relation,
-          phoneNum: contact.phone_number, 
+          phoneNum: contact.phone_number,
           email: contact.email,
           status: contact.status,
           priority: contact.priority,
-          latitude: 0, 
+          latitude: 0,
           longitude: 0,
         }));
 
-        dispatch(setContacts(transformedData)); 
+        setUsers(transformedData);
       } catch (error) {
         console.error('Error fetching contacts:', error);
       }
     };
-
     fetchContacts();
-  }, [dispatch]);
+  }, []);
 
   const handleOpenAddModal = () => {
-    console.log('Opening Modal');
     setAddModalOpen(true);
   };
   const handleCloseAddModal = () => setAddModalOpen(false);
 
   const handleAddUser = (newUser: UserProps) => {
-    dispatch(addContact(newUser));
+    setUsers((prevUsers) => [...prevUsers, newUser]);
   };
 
   const handleOpenEditModal = (user: UserProps) => {
@@ -98,7 +92,9 @@ export function UserView() {
   const handleCloseEditModal = () => setEditModalOpen(false);
 
   const handleEditUser = (updatedUser: UserProps) => {
-    dispatch(editContact(updatedUser));
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
   };
 
   const handleDeleteUser = async () => {
@@ -108,7 +104,7 @@ export function UserView() {
   
         if (result.success) {
 
-          dispatch(deleteContact(userToDelete.phoneNum));
+          setUsers((prevUsers) => prevUsers.filter((user) => user.phoneNum !== userToDelete.phoneNum));
 
           showToast('User deleted successfully', {severity: 'success'});
         } else {

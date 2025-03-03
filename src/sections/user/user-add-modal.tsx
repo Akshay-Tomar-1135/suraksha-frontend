@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Select, 
+  MenuItem,
 } from '@mui/material';
 import { useToast } from 'src/components/snackBar/ToastContext';
 import { userService } from 'src/service/userService';
@@ -48,7 +50,7 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
     relation: '',
     countryCode: '',
     phoneNumber: '',
-    status: '',
+    // status: '',
     email: '',
   });
 
@@ -67,7 +69,7 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       relation: '',
       countryCode: '',
       phoneNumber: '',
-      status: '',
+      // status: '',
       email: '',
     });
     onClose();
@@ -79,7 +81,6 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       relation: relation.trim() === '' ? 'Relation is required' : '',
       countryCode: /^\d{1,3}$/.test(countryCode) ? '' : 'Country Code must be 1-3 digits',
       phoneNumber: /^\d{10}$/.test(phoneNumber) ? '' : 'Phone Number must be 10 digits',
-      status: status.trim() === '' ? 'Status is required' : '',
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Invalid email format',
     };
     setErrors(newErrors);
@@ -94,7 +95,7 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
         relation,
         phone_number: phoneNumber,
         email,
-        status,
+        status: 'inactive', // Hardcoded
         priority,
         latitude,
         longitude,
@@ -108,7 +109,7 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
             id: nanoid(),
             name,
             phoneNum: phoneNumber,
-            status,
+            status: 'inactive', // Hardcoded
             relation,
             email,
             latitude,
@@ -170,14 +171,20 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
             error={Boolean(errors.name)}
             helperText={errors.name}
           />
-          <TextField
-            label="Relation"
+          <Select
+            labelId="relation-label"
             value={relation}
             onChange={(e) => setRelation(e.target.value)}
-            required
-            error={Boolean(errors.relation)}
-            helperText={errors.relation}
-          />
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select Relation</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
+            <MenuItem value="Relative">Relative</MenuItem>
+            <MenuItem value="Guardian">Guardian</MenuItem>
+            <MenuItem value="Friend">Friend</MenuItem>
+          </Select>
+          {errors.relation && <p style={{ color: 'red', fontSize: '0.8rem' }}>{errors.relation}</p>}
+
           <PhoneInput
             countryCode={countryCode}
             phoneNumber={phoneNumber}
@@ -194,14 +201,6 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
             required
             error={Boolean(errors.email)}
             helperText={errors.email}
-          />
-          <TextField
-            label="Status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            required
-            error={Boolean(errors.status)}
-            helperText={errors.status}
           />
         </Box>
       </DialogContent>

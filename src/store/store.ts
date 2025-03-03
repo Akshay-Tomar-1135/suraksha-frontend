@@ -1,11 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userConfigSlice from "./features/userConfig/userConfigSlice";
-import userContactsReducer from "./features/userContacts/userContactsSlice"
 
 const store = configureStore({
     reducer: {
         user: userConfigSlice,
-        userContacts: userContactsReducer
     }
 });
 

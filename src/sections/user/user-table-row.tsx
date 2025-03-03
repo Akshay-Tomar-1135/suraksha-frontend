@@ -54,7 +54,7 @@ export function UserTableRow({ row, selected, onSelectRow, onEditRow, onDeleteRo
         </TableCell>
 
         <TableCell>
-          <Label color={(row.status === 'inactive' && 'error') || 'success'}>{row.status}</Label>
+          <Label color={row.status.toLowerCase() === 'inactive' ? 'error' : 'success'}>{row.status}</Label>
         </TableCell>
 
         <TableCell align="center">

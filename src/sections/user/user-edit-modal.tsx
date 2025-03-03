@@ -7,6 +7,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { useToast } from 'src/components/snackBar/ToastContext';
 import { userService } from 'src/service/userService';
@@ -172,14 +174,20 @@ export function UserEditModal({ open, onClose, user, onEditUser }: UserEditModal
             error={Boolean(errors.name)}
             helperText={errors.name}
           />
-          <TextField
-            label="Relation"
+          <Select
+            labelId="relation-label"
             value={relation}
             onChange={(e) => setRelation(e.target.value)}
-            required
-            error={Boolean(errors.relation)}
-            helperText={errors.relation}
-          />
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select Relation</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
+            <MenuItem value="Relative">Relative</MenuItem>
+            <MenuItem value="Guardian">Guardian</MenuItem>
+            <MenuItem value="Friend">Friend</MenuItem>
+          </Select>
+          {errors.relation && <p style={{ color: 'red', fontSize: '0.8rem' }}>{errors.relation}</p>}
+          
           <PhoneInput
             countryCode={countryCode}
             phoneNumber={phoneNumber}
