@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { useToast } from 'src/components/snackBar/ToastContext'; 
+import { useToast } from 'src/components/snackBar/ToastContext';
 import { userService } from 'src/service/userService';
 
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -36,14 +36,14 @@ export function UserView() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [users, setUsers] = useState<UserProps[]>([]); 
-  const [isAddModalOpen, setAddModalOpen] = useState(false); 
-  
-  const [isEditModalOpen, setEditModalOpen] = useState(false); 
-  const [currentUser, setCurrentUser] = useState<UserProps | null>(null); 
+  const [users, setUsers] = useState<UserProps[]>([]);
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
 
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false); 
-  const [userToDelete, setUserToDelete] = useState<UserProps | null>(null); 
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProps | null>(null);
+
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProps | null>(null);
 
   const { showToast } = useToast();
 
@@ -58,16 +58,14 @@ export function UserView() {
   };
 
   const handleOpenEditModal = (user: UserProps) => {
-    setCurrentUser(user); 
+    setCurrentUser(user);
     setEditModalOpen(true);
   };
   const handleCloseEditModal = () => setEditModalOpen(false);
 
   const handleEditUser = (updatedUser: UserProps) => {
     setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      )
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
   };
 
@@ -75,17 +73,13 @@ export function UserView() {
     if (userToDelete) {
       try {
         const result = await userService.deleteUserContact(userToDelete.phoneNum);
-  
+
         if (result.success) {
-          setUsers((prevUsers) =>
-            prevUsers.filter((user) => user.id !== userToDelete.id)
-          );
+          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete.id));
 
-          showToast('User deleted successfully', {severity: 'success'});
+          showToast('User deleted successfully', { severity: 'success' });
         } else {
-
           showToast(`Failed to delete user: ${result.message}`, { severity: 'error' });
-
         }
       } catch (error) {
         console.error('Error deleting user contact:', error);
@@ -97,17 +91,17 @@ export function UserView() {
   };
 
   const handleOpenDeleteDialog = (user: UserProps) => {
-    setUserToDelete(user); 
-    setDeleteDialogOpen(true); 
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloseDeleteDialog = () => {
-    setDeleteDialogOpen(false); 
-    setUserToDelete(null); 
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
   };
 
   const dataFiltered: UserProps[] = applyFilter({
-    inputData: users, 
+    inputData: users,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -162,7 +156,7 @@ export function UserView() {
                   { id: 'email', label: 'Email', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: 'priority', label: 'Priority' },
-                  { id: 'location', label: 'Location' }, 
+                  { id: 'location', label: 'Location' },
                   { id: '' },
                 ]}
               />
@@ -178,7 +172,7 @@ export function UserView() {
                       row={row}
                       selected={table.selected.includes(row.id)}
                       onSelectRow={() => table.onSelectRow(row.id)}
-                      onEditRow={() => handleOpenEditModal(row)} 
+                      onEditRow={() => handleOpenEditModal(row)}
                       onDeleteRow={() => handleOpenDeleteDialog(row)}
                     />
                   ))}
@@ -206,11 +200,7 @@ export function UserView() {
       </Card>
 
       {/* Add Modal */}
-      <UserAddModal
-        open={isAddModalOpen}
-        onClose={handleCloseAddModal}
-        onAddUser={handleAddUser}
-      />
+      <UserAddModal open={isAddModalOpen} onClose={handleCloseAddModal} onAddUser={handleAddUser} />
 
       {currentUser && (
         <UserEditModal
@@ -226,11 +216,10 @@ export function UserView() {
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
           onClose={handleCloseDeleteDialog}
-          onConfirm={handleDeleteUser} 
-          userName={userToDelete.name} 
+          onConfirm={handleDeleteUser}
+          userName={userToDelete.name}
         />
       )}
-
     </DashboardContent>
   );
 }

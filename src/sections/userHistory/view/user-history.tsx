@@ -3,6 +3,7 @@ import { Box, Card, Typography, CardContent, Pagination, Rating, Button } from '
 import { getAllMockData } from 'src/_mock/_userHistory';
 import { HistoryRow } from 'src/sections/auth/userHistory';
 import { Iconify } from 'src/components/iconify';
+import { DashboardContent } from 'src/layouts/dashboard';
 
 export const UserHistory: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -16,15 +17,19 @@ export const UserHistory: React.FC = () => {
   };
 
   return (
-    <Box sx={{ padding: '2.5rem' }}>
-      {' '}
-      {/* Similar padding to UserView */}
+    <DashboardContent>
+      {/* <Box sx={{ padding: '2.5rem' }}> */} {/* Similar padding to UserView */}
       {/* User History Header */}
-      <Box display="flex" alignItems="center" mb={3}>
+      <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
           Travel History
         </Typography>
       </Box>
+      {/* <Box display="flex" alignItems="center" mb={3}>
+        <Typography variant="h4" flexGrow={1}>
+          Travel History
+        </Typography>
+      </Box> */}
       <Card sx={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.75rem' }}>
         {dataToDisplay.map((row) => (
           <Card
@@ -96,7 +101,8 @@ export const UserHistory: React.FC = () => {
           }}
         />
       </Card>
-    </Box>
+      {/* </Box> */}
+    </DashboardContent>
   );
 };
 
