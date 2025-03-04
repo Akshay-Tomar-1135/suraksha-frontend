@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { nanoid } from '@reduxjs/toolkit';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -16,14 +17,15 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
+import type { UserProps, UserContact } from 'src/interface/UserContact';
+
+import { TableNoEntry } from '../table-no-entry';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
-import type { UserProps } from '../user-table-row';
 
 import { UserAddModal } from '../user-add-modal';
 import { UserEditModal } from '../user-edit-modal';
@@ -34,21 +36,47 @@ import { ConfirmDeleteDialog } from '../confirm-delete-dialog';
 export function UserView() {
   const table = useTable();
 
+  const [users, setUsers] = useState<UserProps[]>([]);
+
   const [filterName, setFilterName] = useState('');
 
-  const [users, setUsers] = useState<UserProps[]>([]);
-  const [isAddModalOpen, setAddModalOpen] = useState(false);
-
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<UserProps | null>(null);
+  const [isAddModalOpen, setAddModalOpen] = useState(false); 
+  
+  const [isEditModalOpen, setEditModalOpen] = useState(false); 
+  const [currentUser, setCurrentUser] = useState<UserProps | null>(null); 
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserProps | null>(null);
 
   const { showToast } = useToast();
 
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await userService.getAllUserContacts();
+        const data: UserContact[] = await response.json();
+
+        const transformedData: UserProps[] = data.map((contact) => ({
+          id: nanoid(),
+          name: contact.name,
+          relation: contact.relation,
+          phoneNum: contact.phone_number,
+          email: contact.email,
+          status: contact.status,
+          priority: contact.priority,
+          latitude: 0,
+          longitude: 0,
+        }));
+
+        setUsers(transformedData);
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      }
+    };
+    fetchContacts();
+  }, []);
+
   const handleOpenAddModal = () => {
-    console.log('Opening Modal');
     setAddModalOpen(true);
   };
   const handleCloseAddModal = () => setAddModalOpen(false);
@@ -75,7 +103,8 @@ export function UserView() {
         const result = await userService.deleteUserContact(userToDelete.phoneNum);
 
         if (result.success) {
-          setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete.id));
+
+          setUsers((prevUsers) => prevUsers.filter((user) => user.phoneNum !== userToDelete.phoneNum));
 
           showToast('User deleted successfully', { severity: 'success' });
         } else {
@@ -153,15 +182,16 @@ export function UserView() {
                   { id: 'name', label: 'Name' },
                   { id: 'relation', label: 'Relation' },
                   { id: 'phoneNum', label: 'Phone Number' },
-                  { id: 'email', label: 'Email', align: 'center' },
+                  { id: 'email', label: 'Email'},
                   { id: 'status', label: 'Status' },
-                  { id: 'priority', label: 'Priority' },
+                  { id: 'priority', label: 'Priority', align: 'center'},
                   { id: 'location', label: 'Location' },
                   { id: '' },
                 ]}
               />
               <TableBody>
-                {dataFiltered
+                {dataFiltered.length === 0 ? (<TableNoEntry />) : (
+                dataFiltered
                   .slice(
                     table.page * table.rowsPerPage,
                     table.page * table.rowsPerPage + table.rowsPerPage
@@ -175,7 +205,8 @@ export function UserView() {
                       onEditRow={() => handleOpenEditModal(row)}
                       onDeleteRow={() => handleOpenDeleteDialog(row)}
                     />
-                  ))}
+                  ))
+                )}
 
                 <TableEmptyRows
                   height={68}
@@ -183,6 +214,7 @@ export function UserView() {
                 />
 
                 {notFound && <TableNoData searchQuery={filterName} />}
+
               </TableBody>
             </Table>
           </TableContainer>

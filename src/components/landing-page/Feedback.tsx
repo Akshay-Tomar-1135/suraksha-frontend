@@ -1,47 +1,55 @@
 import { useState } from 'react';
+import { feedbackService } from 'src/service/feedbackService';
+import { useToast } from 'src/components/snackBar/ToastContext';
 import Button from './Button';
 
 const FeedbackForm = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [rating, setRating] = useState<number | null>(null);
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [feedback, setFeedback] = useState<string>('');
+  const [rating, setRating] = useState<number>(5);
+
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    const formData = {
-      name,
-      email,
-      feedback,
-      rating,
+    const feedbackPayload = {
+      name: name.trim(),
+      email: email.trim(), 
+      feedback: feedback.trim(), 
+      rating, 
     };
   
+    if (!feedbackPayload.name || !feedbackPayload.email || !feedbackPayload.feedback) {
+      showToast('All fields are required.', { severity: 'error' });
+      return;
+    }
+  
+    if (feedbackPayload.rating < 1 || feedbackPayload.rating > 5) {
+      showToast('Rating must be between 1 and 5.', { severity: 'error' });
+      return;
+    }
+  
     try {
-      const response = await fetch('/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await feedbackService.submitFeedback(feedbackPayload);
   
-      if (!response.ok) {
-        const errorMessage = await response.text(); 
-        throw new Error(`Network response was not ok: ${errorMessage}`);
-      }
+      showToast(response.message, { severity: 'success' });
   
-      alert('Feedback submitted successfully!');
-      
       setName('');
       setEmail('');
       setFeedback('');
-      setRating(null);
+      setRating(5);
+
     } catch (error) {
+      
       console.error('Error submitting feedback:', error);
-      alert('There was a problem submitting your feedback. Please try again.');
+      showToast('An error occurred while submitting your feedback. Please try again.', {
+        severity: 'error',
+      });
     }
   };
+  
 
   const handleRatingClick = (rate: number) => {
     setRating(rate);
