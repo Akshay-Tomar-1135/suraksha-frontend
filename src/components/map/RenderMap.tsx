@@ -6,6 +6,7 @@ import {
   DirectionsRenderer,
   useLoadScript,
 } from '@react-google-maps/api';
+import { usePoliceLocation } from 'src/contexts/PoliceLocationContext';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import { FaWalking, FaCar, FaAmbulance, FaExclamationTriangle, FaPhoneAlt } from 'react-icons/fa';
@@ -69,6 +70,17 @@ const RenderMap = () => {
   const routeColors = ['red', 'green', 'blue', 'yellow', 'orange'];
   const [selectedRouteSummary, setSelectedRouteSummary] = useState<RouteSummary | null>(null);
   const [safetyTimer, setSafetyTimer] = useState<number>(-1);
+  const [directionsRequested, setDirectionsRequested] = useState<boolean>(false);
+  const { policeLocations } = usePoliceLocation();
+
+  // Hard-coded markers with blue color
+  const hardCodedMarkers: { position: LatLng; name: string }[] = [
+    { position: { lat: 12.9716, lng: 77.5946 }, name: "Bangalore Palace" },
+    { position: { lat: 12.9789, lng: 77.5917 }, name: "Cubbon Park" },
+    { position: { lat: 12.9719, lng: 77.6412 }, name: "MG Road" },
+    { position: { lat: 12.9855, lng: 77.7123 }, name: "Indiranagar" },
+    { position: { lat: 12.9352, lng: 77.6245 }, name: "Jayanagar" },
+  ];
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -120,7 +132,13 @@ const RenderMap = () => {
     setIsRatingModalOpen(false);
   };
 
-  const handleTravelTypeChange = (type: google.maps.TravelMode) => setTravelType(type);
+  const handleTravelTypeChange = (type: google.maps.TravelMode) => {
+    console.log('Travel type changed to:', type);
+    setTravelType(type);
+    setDirectionsRequested(false); // Reset to allow new directions request
+    setDirectionsResponse(null); // Clear previous response
+    setRoutes([]); // Clear previous routes
+  };
 
   const handleSourceChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSourceName(e.target.value);
@@ -169,6 +187,7 @@ const RenderMap = () => {
   // };
 
   const handleDirectionsCallback = (response: any, status: string) => {
+    console.log('Directions API called - Status:', status, 'Response:', response);
     if (status === 'OK' && response) setDirectionsResponse(response);
   };
 
@@ -359,7 +378,6 @@ const RenderMap = () => {
         <div className="w-full h-[75vh] border border-black border-opacity-50 relative rounded-lg bg-white">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
-            center={source || center}
             options={{
               gestureHandling: 'greedy',
               zoomControl: true,
@@ -374,7 +392,7 @@ const RenderMap = () => {
             <Marker position={center} label="S" />
             <Marker position={destination} label="D" />
 
-            {source && destination && isLoaded && travelType && (
+            {source && destination && isLoaded && travelType && !directionsRequested && (
               <DirectionsService
                 options={{
                   origin: source,
@@ -382,7 +400,11 @@ const RenderMap = () => {
                   travelMode: travelType,
                   provideRouteAlternatives: true,
                 }}
-                callback={handleDirectionsCallback}
+                callback={(response, status) => {
+                  console.log('Directions API called - Status:', status, 'Response:', response);
+                  setDirectionsRequested(true);
+                  if (status === 'OK' && response) setDirectionsResponse(response);
+                }}
               />
             )}
 
@@ -405,6 +427,74 @@ const RenderMap = () => {
                   }
                 />
               ))}
+
+          {isLoaded && google && hardCodedMarkers.map((marker, index) => (
+            <Marker
+              key={index}
+              position={marker.position}
+              icon={{
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="blue"/>
+                  </svg>
+                `)}`,
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 24),
+              }}
+            />
+          ))}
+
+          {isLoaded && google && hardCodedMarkers.map((marker, index) => (
+            <Marker
+              key={`label-${index}`}
+              position={marker.position}
+              icon={{
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              
+                    <text x="60" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black" font-weight="bold">${marker.name}</text>
+                  </svg>
+                `)}`,
+                scaledSize: new google.maps.Size(120, 20),
+                anchor: new google.maps.Point(60, 0),
+              }}
+            />
+          ))}
+
+          {/* Police Location Markers */}
+          {isLoaded && google && policeLocations.map((police) => (
+            <Marker
+              key={`police-${police.police_id}`}
+              position={{ lat: police.latitude, lng: police.longitude }}
+              icon={{
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="red"/>
+                  </svg>
+                `)}`,
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 24),
+              }}
+            />
+          ))}
+
+          {/* Police Location Labels */}
+          {isLoaded && google && policeLocations.map((police) => (
+            <Marker
+              key={`police-label-${police.police_id}`}
+              position={{ lat: police.latitude, lng: police.longitude }}
+              icon={{
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <text x="60" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="black" font-weight="bold">${police.name}</text>
+                  </svg>
+                `)}`,
+                scaledSize: new google.maps.Size(120, 20),
+                anchor: new google.maps.Point(60, 0),
+              }}
+            />
+          ))}
+
           </GoogleMap>
 
           {selectedRouteSummary && (

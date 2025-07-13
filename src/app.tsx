@@ -7,6 +7,7 @@ import { Iconify } from 'src/components/iconify';
 import { SnackbarProvider } from 'notistack';
 import { Provider } from 'react-redux';
 import { ToastProvider } from './components/snackBar/ToastContext';
+import { PoliceLocationProvider } from './contexts/PoliceLocationContext';
 import store from './store/store';
 
 // ----------------------------------------------------------------------
@@ -39,7 +40,9 @@ export default function App() {
       <ThemeProvider>
         <SnackbarProvider maxSnack={3}>
           <ToastProvider>
-            <Router />
+            <PoliceLocationProvider>
+              <Router />
+            </PoliceLocationProvider>
           </ToastProvider>
         </SnackbarProvider>
       </ThemeProvider>

@@ -1,9 +1,11 @@
 // LiveLocation.js
 import React, { useEffect, useState } from 'react';
+import { usePoliceLocation } from 'src/contexts/PoliceLocationContext';
 
 const LiveLocation = ({ userId }) => {
   const [socket, setSocket] = useState(null);
   const [otherUsers, setOtherUsers] = useState([]);
+  const { setPoliceLocations, policeLocations } = usePoliceLocation();
 
   useEffect(() => {
     // Establish WebSocket connection
@@ -15,8 +17,14 @@ const LiveLocation = ({ userId }) => {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log('WebSocket message received:', data);
       if (data.users) {
+        console.log('Other users data received:', data.users);
         setOtherUsers(data.users); // Update other users' locations
+      }
+      if (data.nearest_police_location && data.nearest_police_location.locations) {
+        console.log('Police locations received:', data.nearest_police_location.locations);
+        setPoliceLocations(data.nearest_police_location.locations);
       }
     };
 
@@ -30,7 +38,7 @@ const LiveLocation = ({ userId }) => {
     return () => {
       ws.close();
     };
-  }, [userId]);
+  }, [userId, setPoliceLocations]);
 
   useEffect(() => {
     if (!socket) return;
@@ -61,11 +69,11 @@ const LiveLocation = ({ userId }) => {
 
   return (
     <div>
-      <h3>Other User&#39;s Live Locations</h3>
+      <h3>Nearest Police Locations</h3>
       <ul>
-        {otherUsers.map((user) => (
-          <li key={user.user_id}>
-            User {user.user_id}: ({user.lat.toFixed(5)}, {user.lon.toFixed(5)})
+        {policeLocations.map((police) => (
+          <li key={police.police_id}>
+            <strong>{police.name}</strong>: ({police.latitude.toFixed(5)}, {police.longitude.toFixed(5)})
           </li>
         ))}
       </ul>
