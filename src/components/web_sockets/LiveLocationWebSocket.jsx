@@ -28,15 +28,15 @@ const LiveLocation = ({ userId }) => {
       }
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
+    // ws.onclose = () => {
+    //   console.log('WebSocket connection closed');
+    // };
 
     setSocket(ws);
 
     // Cleanup on unmount
     return () => {
-      ws.close();
+      // ws.close();
     };
   }, [userId, setPoliceLocations]);
 
@@ -62,7 +62,7 @@ const LiveLocation = ({ userId }) => {
     };
 
     // Send location every 5 seconds
-    const intervalId = setInterval(sendLocation, 5000);
+    const intervalId = setInterval(sendLocation, 2000);
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, [socket]);

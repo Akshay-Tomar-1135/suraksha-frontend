@@ -24,6 +24,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import CustomSmileyRating from './components/CustomSmileyRating';
+import LocationAutocomplete from './components/LocationAutocomplete';
 
 type LatLng = {
   lat: number;
@@ -40,6 +41,10 @@ type TravelModesType = {
   [key: string]: { icon: React.ElementType; color: string; travelType: google.maps.TravelMode };
 };
 
+const GOOGLE_MAPS_LIBRARIES: (
+  'places' | 'drawing' | 'geometry' | 'visualization'
+)[] = ['places'];
+
 const mapContainerStyle = {
   height: '100%',
   width: '100%',
@@ -47,11 +52,11 @@ const mapContainerStyle = {
 };
 
 const RenderMap = () => {
-  const [center, setCenter] = useState<LatLng>({ lat: 12.9981, lng: 77.6829 });
-  const source: LatLng = { lat: 12.9881, lng: 77.6829 };
+  // const [center, setCenter] = useState<LatLng>({ lat: 12.9981, lng: 77.6829 });
+  const [source, setSource] = useState<LatLng | null>(null);
   const [travelModes, setTravelModes] = useState<TravelModesType | null>(null);
   const [sourceName, setSourceName] = useState<string>('');
-  const destination: LatLng = { lat: 12.9692, lng: 77.7499 };
+  const [destination, setDestination] = useState<LatLng | null>(null);
   const [destinationName, setDestinationName] = useState<string>('');
   const [travelType, setTravelType] = useState<google.maps.TravelMode | null>(null);
   const [location, setLocation] = useState<{ latitude: number | null; longitude: number | null }>({
@@ -71,6 +76,9 @@ const RenderMap = () => {
   const [selectedRouteSummary, setSelectedRouteSummary] = useState<RouteSummary | null>(null);
   const [safetyTimer, setSafetyTimer] = useState<number>(-1);
   const [directionsRequested, setDirectionsRequested] = useState<boolean>(false);
+  const [shouldShowDirections, setShouldShowDirections] = useState(false);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
+  const [showRouteSelector, setShowRouteSelector] = useState<boolean>(false);
   const { policeLocations } = usePoliceLocation();
 
   // Hard-coded markers with blue color
@@ -84,6 +92,7 @@ const RenderMap = () => {
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   useEffect(() => {
@@ -107,6 +116,7 @@ const RenderMap = () => {
       setCarNumber('');
       setIsJourneyStarted(false);
       setIsRatingModalOpen(true);
+      setShouldShowDirections(false); // Hide directions when journey ends
     }
   };
 
@@ -119,12 +129,14 @@ const RenderMap = () => {
     if (carNumber) {
       setIsJourneyStarted(true);
       setIsModalOpen(false);
+      setShouldShowDirections(true); // Show directions when journey starts
     }
   };
 
   const handleSubmitCarNumberSkip = () => {
     setIsJourneyStarted(true);
     setIsModalOpen(false);
+    setShouldShowDirections(true); // Show directions when journey starts
   };
 
   const handleRatingSubmit = () => {
@@ -140,14 +152,51 @@ const RenderMap = () => {
     setRoutes([]); // Clear previous routes
   };
 
-  const handleSourceChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSourceName(e.target.value);
+  const handleSourceChange = (value: string) => {
+    setSourceName(value);
+  };
 
-  const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setDestinationName(e.target.value);
+  const handleDestinationChange = (value: string) => {
+    setDestinationName(value);
+  };
 
-  const clearSourceInput = () => setSourceName('');
-  const clearDestInput = () => setDestinationName('');
+  const handleSourceLocationSelect = (lat: number, lng: number) => {
+    console.log('Source location selected:', { lat, lng });
+    setSource({ lat, lng });
+    setDirectionsRequested(false); // Reset to allow new directions request
+    setDirectionsResponse(null); // Clear previous response
+    setRoutes([]); // Clear previous routes
+  };
+
+  const handleDestinationLocationSelect = (lat: number, lng: number) => {
+    console.log('Destination location selected:', { lat, lng });
+    setDestination({ lat, lng });
+    setDirectionsRequested(false); // Reset to allow new directions request
+    setDirectionsResponse(null); // Clear previous response
+    setRoutes([]); // Clear previous routes
+  };
+
+  const clearSourceInput = () => {
+    setSourceName('');
+    setSource(null);
+    setDirectionsRequested(false);
+    setDirectionsResponse(null);
+    setRoutes([]);
+    setShowRouteSelector(false);
+    setSelectedRouteIndex(0);
+    setSelectedRouteSummary(null);
+  };
+  
+  const clearDestInput = () => {
+    setDestinationName('');
+    setDestination(null);
+    setDirectionsRequested(false);
+    setDirectionsResponse(null);
+    setRoutes([]);
+    setShowRouteSelector(false);
+    setSelectedRouteIndex(0);
+    setSelectedRouteSummary(null);
+  };
 
   const handleSafetyTimerChange = (event: SelectChangeEvent<number>) =>
     setSafetyTimer(event.target.value as number);
@@ -157,7 +206,8 @@ const RenderMap = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setCenter({ lat: latitude, lng: longitude });
+          console.log('Location received:', { latitude, longitude });
+          // setCenter({ lat: latitude, lng: longitude });
           setLocation({ latitude, longitude });
         },
         (err) => {
@@ -170,12 +220,24 @@ const RenderMap = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(fetchLocation, 3000);
+    const intervalId = setInterval(fetchLocation, 2000);
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    if (directionsResponse) setRoutes(directionsResponse.routes);
+    if (directionsResponse) {
+      setRoutes(directionsResponse.routes);
+      setShowRouteSelector(true);
+      // Set the first route as selected by default
+      if (directionsResponse.routes && directionsResponse.routes.length > 0) {
+        const firstRoute = directionsResponse.routes[0];
+        setSelectedRouteSummary({
+          summary: firstRoute.summary,
+          distance: firstRoute.legs[0]?.distance?.text || '',
+          duration: firstRoute.legs[0]?.duration?.text || ''
+        });
+      }
+    }
   }, [directionsResponse]);
 
   // const handleRouteClick = (route: any, index: number) => {
@@ -189,6 +251,30 @@ const RenderMap = () => {
   const handleDirectionsCallback = (response: any, status: string) => {
     console.log('Directions API called - Status:', status, 'Response:', response);
     if (status === 'OK' && response) setDirectionsResponse(response);
+  };
+
+  const handleRouteSelect = (index: number) => {
+    setSelectedRouteIndex(index);
+    if (routes && routes[index]) {
+      const route = routes[index];
+      setSelectedRouteSummary({
+        summary: route.summary,
+        distance: route.legs[0]?.distance?.text || '',
+        duration: route.legs[0]?.duration?.text || ''
+      });
+    }
+  };
+
+  const getSafetyRating = (routeIndex: number) => {
+    // Simulate different safety ratings for different routes
+    const ratings = [1.2, 4.1, 2.8, 4.5, 1.9];
+    return ratings[routeIndex] || 3.0;
+  };
+
+  const getSafetyColor = (safetyRating: number) => {
+    if (safetyRating >= 4) return 'bg-green-500';
+    if (safetyRating >= 2 && safetyRating <= 4) return 'bg-yellow-500';
+    return 'bg-red-500';
   };
 
   const handleAlertModalClose = () => setIsAlertModalOpen(false);
@@ -238,38 +324,27 @@ const RenderMap = () => {
       <div className="flex flex-col items-center mb-5 bg-white p-5 rounded-lg">
         <div className="flex justify-between items-center mb-5 w-[100%] bg-white p-5 rounded-lg">
           <div className="flex flex-col md:flex-row justify-evenly w-full gap-4">
-            <div className="flex flex-col lg:flex-row gap-4 flex-1">
-              <TextField
-                label="Source (lng, lat)"
-                variant="outlined"
-                value={sourceName}
-                onChange={handleSourceChange}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={clearSourceInput}>
-                      <ClearIcon />
-                    </IconButton>
-                  ),
-                }}
-              />
-              {/* </div> */}
-
-              {/* <div className="flex-1"> */}
-              <TextField
-                label="Destination (lng, lat)"
-                variant="outlined"
-                value={destinationName}
-                onChange={handleDestinationChange}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={clearDestInput}>
-                      <ClearIcon />
-                    </IconButton>
-                  ),
-                }}
-              />
+            <div className="flex flex-col lg:flex-row gap-4 flex-1 w-full">
+              <div className="flex-1">
+                <LocationAutocomplete
+                  label="Source"
+                  value={sourceName}
+                  onChange={handleSourceChange}
+                  onLocationSelect={handleSourceLocationSelect}
+                  placeholder="Enter source location"
+                  onClear={clearSourceInput}
+                />
+              </div>
+              <div className="flex-1">
+                <LocationAutocomplete
+                  label="Destination"
+                  value={destinationName}
+                  onChange={handleDestinationChange}
+                  onLocationSelect={handleDestinationLocationSelect}
+                  placeholder="Enter destination location"
+                  onClear={clearDestInput}
+                />
+              </div>
             </div>
             <div className="flex flex-row md:flex-col lg:flex-row gap-4 items-center justify-evenly">
               {travelModes && (
@@ -300,6 +375,7 @@ const RenderMap = () => {
                 className={`${
                   isJourneyStarted ? 'bg-red-500 hover:bg-red-700' : 'bg-black hover:bg-gray-700'
                 } text-white py-2 px-5 rounded-md shadow-md transition ease-in-out duration-300 flex-1 md:flex-none lg:flex-1`}
+                disabled={!source || !destination}
               >
                 {isJourneyStarted ? 'End Journey' : 'Start Journey'}
               </button>
@@ -378,9 +454,19 @@ const RenderMap = () => {
         <div className="w-full h-[75vh] border border-black border-opacity-50 relative rounded-lg bg-white">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
+            center={
+              source || 
+              destination || 
+              (location.latitude && location.longitude ? { lat: location.latitude, lng: location.longitude } : null) ||
+              { lat: 12.9981, lng: 77.6829 }
+            }
+            zoom={source || destination ? 12 : 10}
             options={{
               gestureHandling: 'greedy',
               zoomControl: true,
+              mapTypeControl: true,
+              streetViewControl: true,
+              fullscreenControl: true,
             }}
           >
             {location.latitude !== null && location.longitude !== null && (
@@ -389,16 +475,24 @@ const RenderMap = () => {
                 label="You are here!"
               />
             )}
-            <Marker position={center} label="S" />
-            <Marker position={destination} label="D" />
+            {source && (
+              <Marker position={source} label="S" />
+            )}
+            {destination && (
+              <Marker position={destination} label="D" />
+            )}
 
-            {source && destination && isLoaded && travelType && !directionsRequested && (
+            {shouldShowDirections && source && destination && isLoaded && travelType && !directionsRequested && (
               <DirectionsService
                 options={{
                   origin: source,
                   destination,
                   travelMode: travelType,
                   provideRouteAlternatives: true,
+                  avoidHighways: false,
+                  avoidTolls: false,
+                  avoidFerries: false,
+                  optimizeWaypoints: false,
                 }}
                 callback={(response, status) => {
                   console.log('Directions API called - Status:', status, 'Response:', response);
@@ -408,25 +502,23 @@ const RenderMap = () => {
               />
             )}
 
-            {routes &&
-              routes.map((route, index) => (
-                <DirectionsRenderer
-                  key={index}
-                  directions={{ ...directionsResponse, routes: [route] }}
-                  options={{
-                    polylineOptions: {
-                      strokeColor: routeColors[index % routeColors.length],
-                      strokeOpacity: 0.7,
-                      strokeWeight: 5,
-                      clickable: true,
-                    },
-                    preserveViewport: true,
-                  }}
-                  onLoad={(directionsRenderer) =>
-                    handleDirectionsRendererReady(directionsRenderer, route, index)
-                  }
-                />
-              ))}
+            {routes && routes.length > 0 && (
+              <DirectionsRenderer
+                directions={{ ...directionsResponse, routes: [routes[selectedRouteIndex]] }}
+                options={{
+                  polylineOptions: {
+                    strokeColor: routeColors[selectedRouteIndex % routeColors.length],
+                    strokeOpacity: 0.7,
+                    strokeWeight: 5,
+                    clickable: true,
+                  },
+                  preserveViewport: true,
+                }}
+                onLoad={(directionsRenderer) =>
+                  handleDirectionsRendererReady(directionsRenderer, routes[selectedRouteIndex], selectedRouteIndex)
+                }
+              />
+            )}
 
           {isLoaded && google && hardCodedMarkers.map((marker, index) => (
             <Marker
@@ -497,8 +589,77 @@ const RenderMap = () => {
 
           </GoogleMap>
 
-          {selectedRouteSummary && (
-            <div className="absolute top-2 left-2 p-2 bg-white rounded-md">
+          {showRouteSelector && routes && routes.length > 0 && (
+            <div className="absolute top-2 left-2 p-2 bg-white rounded-md shadow-lg max-w-md">
+              <h4 className="font-bold mb-2">Available Routes ({routes.length})</h4>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {routes.map((route, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`w-full text-left p-2 rounded border-2 transition-colors ${
+                      selectedRouteIndex === index
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => handleRouteSelect(index)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleRouteSelect(index);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: routeColors[index % routeColors.length] }}
+                        />
+                        <span className="font-medium">Route {index + 1}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {route.legs[0]?.distance?.text} • {"Duration: "}{route.legs[0]?.duration?.text}
+                      </div>
+                    </div>
+                                          <div className="flex items-center space-x-2 mt-1">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-xs font-medium text-gray-700">Safety:</span>
+                          <div className="flex items-center space-x-1">
+                            {(() => {
+                              const safetyRating = getSafetyRating(index);
+                              return [1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  className={`w-3 h-3 ${
+                                    star <= safetyRating ? 'text-yellow-500 fill-current' : 'text-gray-300'
+                                  }`}
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                </svg>
+                              ));
+                            })()}
+                          </div>
+                          <span className="text-xs font-semibold text-gray-800 ml-1">
+                            {getSafetyRating(index).toFixed(1)}
+                          </span>
+                        </div>
+                        <div className={`w-2 h-2 rounded-full ${getSafetyColor(getSafetyRating(index))}`} />
+                      </div>
+                    {route.summary && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {route.summary}
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedRouteSummary && !showRouteSelector && (
+            <div className="absolute top-2 left-2 p-2 bg-white rounded-md shadow-lg">
               <h4 className="font-bold">Selected Route Summary</h4>
               <p>
                 <strong>Summary:</strong> {selectedRouteSummary.summary}
