@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { nanoid } from '@reduxjs/toolkit';
 import {
   Box,
   Button,
@@ -7,9 +8,12 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Select, 
+  MenuItem,
 } from '@mui/material';
 import { useToast } from 'src/components/snackBar/ToastContext';
 import { userService } from 'src/service/userService';
+import PhoneInput from '../auth/phoneInput';
 
 type UserAddModalProps = {
   open: boolean;
@@ -33,7 +37,8 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
 
   const [name, setName] = useState('');
   const [relation, setRelation] = useState('');
-  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
   const [priority, setPriority] = useState(1);
@@ -41,57 +46,56 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
   const [longitude, setLongitude] = useState(0);
 
   const [errors, setErrors] = useState({
-    name: false,
-    relation: false,
-    phone: false,
-    status: false,
-    email: false,
+    name: '',
+    relation: '',
+    countryCode: '',
+    phoneNumber: '',
+    // status: '',
+    email: '',
   });
 
   const handleClose = () => {
     setName('');
     setRelation('');
-    setPhone('');
+    setCountryCode('');
+    setPhoneNumber('');
     setStatus('');
     setEmail('');
     setPriority(1);
     setLatitude(0);
     setLongitude(0);
     setErrors({
-      name: false,
-      relation: false,
-      phone: false,
-      status: false,
-      email: false,
+      name: '',
+      relation: '',
+      countryCode: '',
+      phoneNumber: '',
+      // status: '',
+      email: '',
     });
     onClose();
   };
 
   const validateFields = () => {
     const newErrors = {
-      name: name.trim() === '',
-      relation: relation.trim() === '',
-      phone: phone.trim() === '',
-      status: status.trim() === '',
-      email: email.trim() === '',
+      name: name.trim() === '' ? 'Name is required' : '',
+      relation: relation.trim() === '' ? 'Relation is required' : '',
+      countryCode: /^\d{1,3}$/.test(countryCode) ? '' : 'Country Code must be 1-3 digits',
+      phoneNumber: /^\d{10}$/.test(phoneNumber) ? '' : 'Phone Number must be 10 digits',
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Invalid email format',
     };
     setErrors(newErrors);
     return !Object.values(newErrors).some((error) => error);
   };
 
-  function generateUniqueId(): string {
-    return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-  }
-
   const handleAddUser = async () => {
     if (validateFields()) {
       const newUserContact = {
-        aadhaar_number: 123456789,
+        aadhaar_number: 123456789, // Hardcoded for the time being
         name,
         relation,
-        phone_number: phone,
+        phone_number: phoneNumber,
         email,
-        status,
+        status: 'inactive', // Hardcoded
         priority,
         latitude,
         longitude,
@@ -102,10 +106,10 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       
         if (response.ok) {
           onAddUser({
-            id: generateUniqueId(),
+            id: nanoid(),
             name,
-            phoneNum: phone,
-            status,
+            phoneNum: phoneNumber,
+            status: 'inactive', // Hardcoded
             relation,
             email,
             latitude,
@@ -125,6 +129,15 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       } finally {
         handleClose();
       }
+    }
+  };
+
+  const handlePhoneInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name: inputName, value } = event.target;
+    if (inputName === 'countryCode') {
+      setCountryCode(value);
+    } else if (inputName === 'phoneNumber') {
+      setPhoneNumber(value);
     }
   };
 
@@ -149,11 +162,46 @@ export function UserAddModal({ open, onClose, onAddUser }: UserAddModalProps) {
       </DialogTitle>
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required error={errors.name} helperText={errors.name ? 'Name is required' : ''} />
-          <TextField label="Relation" value={relation} onChange={(e) => setRelation(e.target.value)} required error={errors.relation} helperText={errors.relation ? 'Relation is required' : ''} />
-          <TextField label="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required error={errors.phone} helperText={errors.phone ? 'Phone No. is required' : ''} />
-          <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required error={errors.email} helperText={errors.email ? 'Email is required' : ''} />
-          <TextField label="Status" value={status} onChange={(e) => setStatus(e.target.value)} required error={errors.status} helperText={errors.status ? 'Status is required' : ''} />
+          <TextField
+            label="Name"
+            sx={{marginTop:1}}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            error={Boolean(errors.name)}
+            helperText={errors.name}
+          />
+          <Select
+            labelId="relation-label"
+            value={relation}
+            onChange={(e) => setRelation(e.target.value)}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select Relation</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
+            <MenuItem value="Relative">Relative</MenuItem>
+            <MenuItem value="Guardian">Guardian</MenuItem>
+            <MenuItem value="Friend">Friend</MenuItem>
+          </Select>
+          {errors.relation && <p style={{ color: 'red', fontSize: '0.8rem' }}>{errors.relation}</p>}
+
+          <PhoneInput
+            countryCode={countryCode}
+            phoneNumber={phoneNumber}
+            setValue={handlePhoneInputChange}
+            formErrors={{
+              countryCode: errors.countryCode,
+              phoneNumber: errors.phoneNumber,
+            }}
+          />
+          <TextField
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            error={Boolean(errors.email)}
+            helperText={errors.email}
+          />
         </Box>
       </DialogContent>
       <DialogActions sx={{ display: 'flex', gap: 1, mt: 2 }}>

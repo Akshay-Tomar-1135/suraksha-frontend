@@ -22,3 +22,25 @@ export interface UpdateUserContactQuery {
   latitude: number;
   longitude: number;
 }
+
+export type UserProps = {
+  id: string;
+  name: string;
+  phoneNum: string;
+  status: string;
+  relation: string;
+  avatarUrl?: string;
+  email: string;
+  latitude: number;
+  longitude: number;
+  priority: number;
+};
+
+export interface UserContact {
+  name: string;
+  relation: string;
+  phone_number: string;
+  email: string;
+  status: string;
+  priority: number;
+}

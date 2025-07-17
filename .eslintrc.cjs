@@ -38,6 +38,7 @@ module.exports = {
     'no-else-return': 1,
     'consistent-return': 1,
     'import/prefer-default-export': 0,
+    'arrow-body-style': 0,
     'prefer-destructuring': [1, { object: true, array: false }],
     // typescript
     '@typescript-eslint/naming-convention': 0,
