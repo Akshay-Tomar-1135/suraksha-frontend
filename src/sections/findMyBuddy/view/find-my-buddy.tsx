@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 
 import { DashboardContent } from 'src/layouts/dashboard';
+import RenderMap from 'src/components/map/RenderMap';
 import { mockData } from '../../../_mock/_userHistory';
 
 export const FindMyBuddy: React.FC = () => {
@@ -161,7 +162,7 @@ export const FindMyBuddy: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Box
+          {/* <Box
             sx={{
               mt: 4,
               height: 300,
@@ -174,6 +175,17 @@ export const FindMyBuddy: React.FC = () => {
             }}
           >
             <Typography variant="h6">MAP</Typography>
+          </Box> */}
+          <Box
+            sx={{
+              mt: 4,
+              height: '75vh', // or any height you prefer
+              borderRadius: 1,
+              overflow: 'hidden',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <RenderMap />
           </Box>
 
           <Box sx={{ mt: 4 }}>
