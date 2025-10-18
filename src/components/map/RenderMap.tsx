@@ -81,6 +81,7 @@ const RenderMap = () => {
   const [showRouteSelector, setShowRouteSelector] = useState<boolean>(false);
   const { policeLocations } = usePoliceLocation();
 
+  
   // Hard-coded markers with blue color
   const hardCodedMarkers: { position: LatLng; name: string }[] = [
     { position: { lat: 12.9716, lng: 77.5946 }, name: "Bangalore Palace" },
